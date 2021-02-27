@@ -1,4 +1,4 @@
-console.log("2SHADER!")
+console.log("vertex buffer!")
 
 const CANVAS = document.getElementById("canvas");
 const GL = CANVAS.getContext("webgl2");
@@ -21,8 +21,7 @@ var shader = {
            gl_Position = position;
            gl_PointSize = pointSize;
            linkedColor = color;
-        }
-        `
+        }        `
     ,
     fragmentSrc : 
         `#version 300 es
@@ -46,6 +45,8 @@ function start(){
     GL.viewport(0,0,CANVAS.clientWidth, CANVAS.clientHeight);
     GL.clearColor(0,0,0,1);
 
+    createVertices();
+
     shader.program = createShaders();
     getPropertyLocations();
     setShaderProperties();
@@ -56,18 +57,22 @@ function start(){
 
 function draw(){
     GL.clear(GL.COLOR_BUFFER_BIT);
-    GL.drawArrays(GL.POINTS,0,1);
+    GL.drawArrays(GL.POINTS,0,3);
 }
 
 function getPropertyLocations(){
     shader.propertyLocationPosition = GL.getAttribLocation(shader.program,"position");
     shader.propertyLocationColor  = GL.getAttribLocation(shader.program,"color");
     shader.propertyLocationPointSize  = GL.getAttribLocation(shader.program,"pointSize");
+
+    GL.enableVertexAttribArray(shader.propertyLocationPosition)
 }
 
 function setShaderProperties(){
     GL.useProgram(shader.program);
-    GL.vertexAttrib3f(shader.propertyLocationPosition,0,0.2,0);
+    
+    GL.vertexAttribPointer(shader.propertyLocationPosition,3, GL.FLOAT,false,0,0);
+
     GL.vertexAttrib3f(shader.propertyLocationColor,0,1,1);
     GL.vertexAttrib1f(shader.propertyLocationPointSize,50);
 
@@ -97,4 +102,20 @@ function getAndCompileShader(source, shaderType){
     }
 
     return newShader;
+}
+
+function createVertices(){
+    var positions = [
+        random(), random(), random(),
+        random(), random(), random(),
+        random(), random(), random()
+    ];
+
+    var positionBuffer = GL.createBuffer();
+    GL.bindBuffer(GL.ARRAY_BUFFER,positionBuffer)
+    GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(positions), GL.STATIC_DRAW);
+}
+
+function random(){
+    return Math.random()*2-1
 }
