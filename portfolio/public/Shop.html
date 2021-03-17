@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Quality+ Shop </title>
+	<link rel = "stylesheet" type="text/css" href = "Shop.css">
+</head>
+<body >
+<header class = "header-box"> <h>Quality+ Shop</h></header>
+
+<br>
+<br>
+
+<div class = "margins">
+<script src = "Shop.js"></script>
+
+
+
+
+
+
+<form id="shopping" action="Shop.html" method=" = "post" >
+
+	<center><table style = "width: 100% ">
+
+<tr>
+
+<td>
+<h class = "product-title">Q+ Sneakers</h>
+<p>Run faster, jump higher. <br> <br> Price: $90/pair <br> Quantity desired: </p>
+<input type="number" placeholder = "0" id = "sneakers-qty" name = "sneakers-qty" min ="0"> <br>
+</td>
+
+
+<td>
+<h class = "product-title">Q+ Jersey</h>
+<p>Sweat harder, work better. <br> <br> Price: $25/each <br> Quantity desired: </p>
+<input type="number" placeholder = "0" id = "jersey-qty" name = "jersey-qty" min ="0"> <br>
+</td>
+
+
+<td>
+<h class = "product-title">Q+ Supplements</h>
+<p>Get healthier, get smarter. <br> <br> Price: $30/bottle <br> Quantity desired: </p>
+<input type="number" placeholder = "0" id = "supplements-qty" name = "supplements-qty" min ="0"> <br>
+
+</td>
+
+</tr>
+
+</table></center>
+
+
+
+<h class = "product-title"><br>Estimate Order</h><br><br>
+<p style="display: inline;">City (required):</p>
+
+	<select id="city">
+		<option value="n">-Select City-</option>
+		<option value="akl">Auckland(2.5% tax)</option>
+		<option value="wel">Wellington</option>
+		<option value="dun">Dunedin</option>
+		<option value="ch">Christchurch</option>
+	</select>
+<br><br>
+
+
+
+	<h> Shipping and Handling: </h><br><br>
+
+	
+	<input type="radio" value="pickup" name ="shipping" id = "pickup" checked>
+	<label for="pickup">Pickup (free)</label><br>
+
+	<input type="radio" value="courier" name ="shipping" id = "courier" >
+	<label for="pickup">Courier ($2/item)</label><br>
+
+	<input type="radio" value="weekend" name ="shipping" id = "weekend" >
+	<label for="pickup">Weedkend Delivery Courier ($5/item)</label>
+
+
+
+
+
+	<h> Click to estimate: </h><br><br>
+	
+	<input type="button" onclick="calculateTotal()" value = "Estimate Total" >
+	<span id="showTotal" style = "display: inline; padding-left: 20px">  </span><br>
+	
+
+
+</form>
+
+
+
+<p id="totalItems" >  </p>
+<p id="totalShipping" >  </p>
+<p id="tax" style >  </p>
+
+
+</div>
+
+</body>
+
+
+
+</html>

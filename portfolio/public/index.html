@@ -1,0 +1,178 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <link rel = "stylesheet" type="text/css" href = "mansinh.css">
+      <script src="jquery-3.5.1.min.js"></script>
+    </head>
+
+    
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+       
+    
+    <body >
+     <div id = "top"> </div>
+      <script src = "mansinh.js"></script>
+      <a class ="title" id="title" href="#home"> .mansinh</a>
+
+
+      <!--hidden navigation header/menu when screen width small-->
+      <div class="header" id = "header">
+        <a class ="titleHeader" href="#home"> .mansinh</a>
+        <div class ="nav" id ="navigation">  
+          <a href="#work" > Work </a>
+          <a href="#about"> About </a>
+          <a href="#contact"> Contact </a>
+        </div>
+      </div>
+     
+
+      <!--bar icon-->
+
+      <div id = "menu" class="menu" onclick="inflateHeader()"></div>
+     
+   
+      <div class="content" onclick="closeHeader()">
+        <center id="home" class="home_css">
+
+          <br><br><br><br><br><br><br><br><br><br><br>
+          <h2>Hi, I'm Mansinh</h2>
+          <br>
+            
+          <p >I'm a Web/App developer <br> and UX designer <br> I also do drawing and sculpting <br> Here are some of my work </p>
+       
+          <br><br><br><br><br>
+
+            
+        </center>
+
+        <div class = "enlarged" id="enlarged"> 
+          <img   class = "enlarged_img" id = "enlarged_img" onclick="closeEnlarged()">
+        </div>
+        
+        <div id="work" class="work_css">
+          <br><br><br><br><br>
+
+                          
+                              <div>
+                                  <p1>Life of Dragon Prototype</p1>
+                                  <img src="dragon.png" class="work_item" onclick="onImgClicked(this.src)">
+                                  <p2>You are a dragon, burn villages, collect gold, grow powerful and defeat the Kingdom to avenge your slain mother</p2>
+                              </div>
+                              <br><br>
+
+                                  <figure>
+                                      <p1>Its Raining Bomb Crabs!</p1>
+                                      <p2>Defend your tower from waves of exploding crabs</p2>
+                                  </figure>
+                                  <figure>
+                                      <p1>Watshape</p1>
+                                      <p2>A game for chidren where they must identify falling shapes before they hit the ground</p2>
+                                  </figure>
+
+
+                              <img src="concept.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="kokeshi.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="todomon1.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="todomon2.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="todomon3.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="todomon4.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="devsoup1.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="devsoup2.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="devsoup3.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="devsoup4.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="concept1.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="game.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="shaman.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="animals.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="environment.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="environment1.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="ill_fated_couple.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="surreal.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="madmen.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="nightmare.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="tim.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="head_studies.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="figure_drawing.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="life_drawing.png" class="work_item" onclick="onImgClicked(this.src)">
+                              
+                              <img src="cloud2.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="cloud3.png" class="work_item" onclick="onImgClicked(this.src)">
+                              
+                              <img src="cloud5.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="cloud6.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="bubblegum.png" class="work_item" onclick="onImgClicked(this.src)">
+                              <img src="figurines.png" class="work_item" onclick="onImgClicked(this.src)">
+                      
+          </div>
+          
+          <br><br><br><br><br>
+         
+        </div>
+
+        <div id="about" class="about_css">
+
+          <br><br><br><br><br><br>
+        
+          <h1>A little about myself.</h1>
+          
+          <p> My name is Mansinh Kuang and I love coding and making things. <br> I am currently studying software engineering at Yoobee colleges <br> and have a BSc in Physics from the University of Auckland. <br> I am self taught in drawing and sculpting and I dabble in video game development with Unity in my spare time. </p>
+            
+        </div>     
+        
+
+      
+
+        <div id="contact" class="contact_css" >
+          <!--<form name = "contactForm" id = "contactForm" action = "mailto:manhkwong@gmail.com?subject=website message" method="post" enctype="text/plain">-->
+          <br><br><br><br><br><br><br>
+          <h1>Get in Touch</h1>
+          <br>
+
+          <label class = "label" for="name" >Name  </label>
+          <b id = "nameError" ></b><br><br>
+          <input  class="inputField" type="text" name="name" id="name"  ><br><br>
+
+          <label class = "label" for="email" >Email</label>
+          <b id = "emailError" ></b><br><br>
+          <input  class="inputField" type="text" name="email" id="email" ><br><br>
+
+          <label class = "label" for="phone">Phone</label>
+          <b id = "phoneError" ></b><br><br>
+          <input class="inputField"  type="number" name="phone" id="phone"  ><br><br>
+
+          <label class = "label" for="message" >Message</label>
+          <b id = "messageError" ></b><br><br>
+          <textarea class = "message" name="message" id = "message" rows="10" cols = "40" form = "contactForm"></textarea><br><br><br>
+
+
+          <!--<input class="button" type="button" id="submitButton" value="Submit">-->
+          <button class = "button" onclick = "onSubmit()">Submit</button>
+
+
+          <br><br><br><br><br>
+             
+          <!--</form>-->
+        </div>
+    
+  </div>
+
+
+
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+  <script src="/__/firebase/7.14.5/firebase-app.js"></script>
+
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  <script src="/__/firebase/7.14.5/firebase-analytics.js"></script>
+
+  <!-- Initialize Firebase -->
+  <script src="/__/firebase/init.js"></script>
+
+
+
+  </body>
+   
+
+
+  </html>
