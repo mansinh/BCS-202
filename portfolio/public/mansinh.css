@@ -234,6 +234,32 @@ font-size: 14px;
 margin-left: 10px;
 margin-bottom: 30px;
 }
+a{
+    width: 100px;
+    height: 30px;
+    max-width: 90%;
+    
+    
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    font-weight: bold;
+    
+    padding-top:10px;
+    padding-left:10px;
+    padding-right:10px;
+    text-align: center;
+    transition: 0.2s;
+    border: none;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    color:#215D66;
+    box-shadow: 0px 3px 10px rgba(0,0,0,0.1)
+
+    
+
+    bottom:0;
+    }
 h2{
     color: white;
     font-weight: bold;
