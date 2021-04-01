@@ -1,13 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="ant_lab.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style></style>
 </head>
+
 <body>
-    <canvas id="canvas" width="1024" height="576"></canvas>
-    <script src="./main.js"></script>
+
+
+
+
+
+    <div class="canvasHolder">
+        <canvas id="canvas" class="canvas"></canvas>
+    </div>
+
+
+
+    <div class="pallet">
+        <label for="brushSize">brush size</label>
+        <input type="range" min="1" max="10" value="1" name="brushSize" id="brushSize">
+        <p id="handTool" onclick="onHandTool()">hand</p>
+        <p id="terrainTool" onclick="onTerrainTool()">terrain</p>
+        <p id="eraseTool" onclick="onEraseTool()">erase</p>
+        <p id="foodTool" onclick="onFoodTool()">food</p>
+    </div>
+    <script src=" ./main.js"></script>
 </body>
+
 </html>

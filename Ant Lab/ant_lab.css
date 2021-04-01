@@ -1,0 +1,50 @@
+body{
+    margin:0px;
+    width:100%;
+    overflow: hidden;
+    
+}
+
+.pallet{
+    width:200px;
+    position: absolute;
+    right: 0px;
+    
+
+}
+
+.pallet p{
+   
+    padding:10px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+
+.pallet label{
+    padding:10px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+.pallet input{
+    padding:10px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+    right:0px;
+    width: 50px;
+    
+}
+
+.canvas{
+   
+    position: absolute;
+    top: 0px;
+}
+}
+.canvasHolder{
+    left:0px;
+    position: absolute;
+    top: 0px;
+}
