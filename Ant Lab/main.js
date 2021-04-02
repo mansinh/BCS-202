@@ -6,8 +6,8 @@ const FLOAT_SIZE_BYTES = 4; //float = 32 bits, byte = 8 bits
 const STRIDE = 7 * FLOAT_SIZE_BYTES;
 const VERTEX_COLOR_OFFSET = 3 * FLOAT_SIZE_BYTES;
 const ANT_COUNT = 50;
-const WIDTH = 400;
-const HEIGHT = 400;
+const WIDTH = 200;
+const HEIGHT = 200;
 const RANGE = 0.3;
 const ASPECT_RATIO_WIDTH_MULTIPLIER = CANVAS.clientWidth / CANVAS.clientHeight;
 
@@ -19,8 +19,9 @@ function ant() {
     this.direction = 0;
     this.maxSpeed = 0.1;
     this.maxTurn = Math.PI / 10;
-    this.color = 1;
+    this.action = 0; //0=findFood, 1=foodFound1, 2 = ...,
 }
+
 
 var cells = []
 
@@ -90,8 +91,8 @@ var shader = {
                     color = vec4(1.0,1.0,0.0,1.0);
                 }
                 
-                else if(linkedColor.g > 0.0){
-                    color = vec4(linkedColor.a,0.8*linkedColor.g ,0.8*linkedColor.g ,1.0);
+                else if(linkedColor.g+linkedColor.b > 0.0){
+                    color = vec4(linkedColor.b,0.8*(linkedColor.g+linkedColor.b),0.8*linkedColor.g ,1.0);
                     //color = linkedColor;
                 }
                
@@ -192,6 +193,7 @@ CANVAS.addEventListener("mousemove", (e) => {
         }
     }
 });
+onHandTool();
 
 function drawFood(mouseX, mouseY) {
     var x = Math.min(parseInt((mouseX + 1.0) * WIDTH / 2), WIDTH - 1);
@@ -235,43 +237,103 @@ function getCells(x, y, size) {
     var selectedCells = [];
     for (let i = -size; i <= size; i++) {
         for (let j = -size; j < size; j++) {
-            selectedCells.push(getCell(x, y, i, j));
+            if(i*i+j*j < size*size){
+                selectedCells.push(getCell(x, y, i, j));
+            }
         }
     }
     return selectedCells;
 }
 
-var then = 0;
-start();
 
-function start() {
-    CANVAS.width = document.body.clientWidth - 200;
-    CANVAS.height = (document.body.clientWidth - 200);
+
+var then = 0;
+var dt = 0;
+init();
+
+window.addEventListener('resize', function(event){
+    CANVAS.width = window.innerWidth - 200;
+    CANVAS.height = window.innerHeight;
+    GL.viewport(0, 0, CANVAS.clientWidth, CANVAS.clientHeight);
+  });
+
+  
+
+function init() {
+    CANVAS.width = window.innerWidth - 200;
+    CANVAS.height = window.innerHeight;
     GL.viewport(0, 0, CANVAS.clientWidth, CANVAS.clientHeight);
     GL.clearColor(0, 0, 0, 1);
 
     createAnts();
     createTerrain();
     createVertices();
-
     shader.program = createShaders();
     getPropertyLocations();
     setShaderProperties();
-
-    then = performance.now()
-    requestAnimationFrame(update);
-
+    
+    update();
 }
 
+var isPlaying = false;
+function play(){
+    isPlaying = !isPlaying;
+    if(isPlaying){
+        then = performance.now()
+        
+        document.getElementById("playButton").innerHTML = "PAUSE";
+    }
+    else{
+        document.getElementById("playButton").innerHTML = "PLAY";
+    }
+}
 
+function stop(){
+    isPlaying = false;
+    for (let i = 0.0; i < ants.length; i++) {
+        ants[i].direction = random() * Math.PI * 2;
+        ants[i].x =0;
+        ants[i].y =0;
+  
+    }
+    for (let i = 0.0; i < cells.length; i++) {
+        cells[i].foodPh = 0;
+        cells[i].homingPh = 0;
+    }
+    document.getElementById("playButton").innerHTML = "PLAY";
+    let j = 0;
+    for (let i = 0; i < ants.length; i++) {
+        updateAntVertices(i, j);
+        j += STRIDE / FLOAT_SIZE_BYTES;
+    }
+   
+}
+function clearCells(){
+    console.log("CLEAR");
+    for (let i = 0.0; i < cells.length; i++) {
+        cells[i].terrain = 0;
+        cells[i].food = 0;
+        cells[i].foodPh = 0;
+        cells[i].homingPh = 0;
+    }
+    
+    
+}
 
+function update() {
+    if (!document.hasFocus()){
+        isPlaying = false;
+        document.getElementById("playButton").innerHTML = "PLAY";
+    }
 
-function update(now) {
-    updateAnts();
+    if(isPlaying){
+        updateAnts();
+    }
     updateCells();
+    
     draw();
-
     requestAnimationFrame(update);
+    
 }
 
 function draw() {
@@ -331,6 +393,7 @@ function getAndCompileShader(source, shaderType) {
 }
 
 function createAnts() {
+   
     for (let i = 0; i < ANT_COUNT * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
         let newAnt = new ant();
         newAnt.x = 0;
@@ -353,6 +416,7 @@ function createTerrain() {
 
 
 function createVertices() {
+    vertices=[];
     for (let i = 0.0; i < cells.length; i++) {
         //positions
         vertices.push(cells[i].x);
@@ -381,11 +445,11 @@ function createVertices() {
         vertices.push(2.0);
     }
 
-
+    
     vertexDataBuffer = GL.createBuffer();
     GL.bindBuffer(GL.ARRAY_BUFFER, vertexDataBuffer)
     GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(vertices), GL.STATIC_DRAW);
-
+   
 }
 var frameCount = 0.0;
 var totalTime = 0.0;
@@ -394,8 +458,8 @@ var totalTime = 0.0;
 var t = 0;
 function updateAnts() {
     now = performance.now();
-    var dt = now - then;
-    dt *= 0.001;
+    dt = (now - then)* 0.001;
+
     then = now;
     let j = 0;
     for (let i = 0; i < ants.length; i++) {
@@ -409,9 +473,9 @@ function updateAnts() {
     }
     t += dt;
 
-    //console.log(frameCount / totalTime)
-    //totalTime += dt;
-    //frameCount++;
+    console.log(frameCount / totalTime)
+    totalTime += dt;
+    frameCount++;
 }
 
 
@@ -452,7 +516,14 @@ function updateAnt(i, dt) {
     }
 
     if (t > 0.15) {
-        layHomingPh(x, y)
+        switch(ants[i].action){
+            case 0: 
+                layHomingPh(x, y);
+                break;
+            case 1: 
+                layFoodPh(x, y);
+                break;
+        }
     }
 
 
@@ -460,6 +531,9 @@ function updateAnt(i, dt) {
 
 function layHomingPh(x, y) {
     cells[y + x * HEIGHT].homingPh = 1;
+}
+function layFoodPh(x, y) {
+    cells[y + x * HEIGHT].foodPh = 1;
 }
 
 function terrainCollsion(x, y) {
@@ -491,8 +565,10 @@ function updateAntVertices(i, j) {
 function updateCells() {
     let j = 0;
     for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-        cells[j].homingPh *= 0.999;
-        cells[j].foodPh *= 0.999;
+        if(isPlaying){
+            cells[j].homingPh *= 0.999;
+            cells[j].foodPh *= 0.999;
+        }
         vertices[i + 3] = cells[j].terrain;
         vertices[i + 4] = cells[j].homingPh * 0.8;
         vertices[i + 5] = cells[j].foodPh * 0.8;
