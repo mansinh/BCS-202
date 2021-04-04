@@ -6,6 +6,11 @@
     <link rel="stylesheet" type="text/css" href="ant_lab.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src=" ./antlab.js"></script>
+    <script src=" ./ant.js"></script>
+    <script src=" ./cell.js"></script>
+
+    <script src=" ./shader.js"></script>
     <style></style>
 </head>
 
@@ -22,18 +27,30 @@
 
 
     <div class="pallet">
-        <label for="brushSize">brush size</label>
-        <input type="range" min="1" max="10" value="1" name="brushSize" id="brushSize">
+        <br>
+        <p id="fps">fps</p>
+        <div class="slider">
+
+            <input type="range" min="1" max="10" value="5" name="brushSize" id="brushSize">
+            <label for="brushSize">brush size</label>
+        </div>
+        <div class="slider">
+
+            <input type="range" min="1" max="10" value="10" name="brushDensity" id="brushDensity">
+            <label for="brushDensity">brush density</label>
+        </div>
         <p id="handTool" onclick="onHandTool()">hand</p>
         <p id="terrainTool" onclick="onTerrainTool()">terrain</p>
         <p id="eraseTool" onclick="onEraseTool()">erase</p>
         <p id="foodTool" onclick="onFoodTool()">food</p>
-        
-        <button id ="playButton" onclick="play()">PLAY</button>
+
+        <button id="playButton" onclick="play()">PLAY</button>
         <button onclick="stop()">STOP</button>
         <button onclick="clearCells()">CLEAR</button>
     </div>
-  
+    <script src=" ./tools.js"></script>
+
+
     <script src=" ./main.js"></script>
 </body>
 

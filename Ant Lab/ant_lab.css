@@ -15,33 +15,33 @@ body{
 
 .pallet p{
    
-    padding:10px;
+    padding-left:15px;
     text-decoration: none;
     font-family: Arial, Helvetica, sans-serif;
     background-color: white;
 }
 
-.pallet label{
-    padding:10px;
+.slider{
+    
+     padding-left:15px;
     text-decoration: none;
     font-family: Arial, Helvetica, sans-serif;
     background-color: white;
 }
-.pallet input{
-    padding:10px;
-    text-decoration: none;
-    font-family: Arial, Helvetica, sans-serif;
+
+
+.slider input{
+
     background-color: white;
-    right:0px;
-    width: 50px;
     
+    width: 70px;
 }
 
 .canvas{
    
     position: absolute;
     top: 0px;
-}
+
 }
 .canvasHolder{
     left:0px;
