@@ -18,7 +18,7 @@ const VERTEX_SRC =
            if(position.z == 1.0){
                 gl_PointSize = 3.0;
            }
-           else{
+           else if(position.z == 0.0){
                if(color.r > 0.0){
                   gl_PointSize = 7.0;
                }
@@ -28,6 +28,9 @@ const VERTEX_SRC =
                else{
                  gl_PointSize = 2.0;
                }
+           }
+           else {
+               gl_PointSize = 5.0;
            }
      
            linkedColor = color;
@@ -49,10 +52,8 @@ const FRAGMENT_SRC =
             }
             else{
                 color = vec4(0.0,0.0,0.0,1.0);
-                if(linkedPosition.z == 1.0){
-                    color = vec4(1.0,1.0,1.0,1.0);
-                }
-                else {
+        
+                if(linkedPosition.z == 0.0 ){
                     if(linkedColor.r >0.0){
                      color = vec4(0.12,0.12,0.15,1.0);
                     }
@@ -65,6 +66,9 @@ const FRAGMENT_SRC =
                         //color = linkedColor;
                     }
                
+                }
+                else{
+                    color = vec4(1.0,1.0,1.0,1.0);
                 }
             }
         }

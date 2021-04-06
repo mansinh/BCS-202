@@ -19,7 +19,13 @@ class Tools {
     }
 
 
-
+    handTool(mouseX, mouseY) {
+        if (HOME.collide(mouseX, mouseY) || HOME.selected == true) {
+            HOME.x = mouseX;
+            HOME.y = mouseY;
+            HOME.selected = true;
+        }
+    }
 
 
 
