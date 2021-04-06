@@ -9,7 +9,7 @@ class Ant {
         this.direction = 0;
         this.dirVector = new Vec2(0.0, 0.0);
         this.maxSpeed = 0.1;
-        this.maxTurn = Math.PI / 10;
+        this.maxTurn = Math.PI / 15;
         this.action = FINDFOOD;
         this.t = 0.0;
         this.senseRange = 2;
@@ -74,27 +74,25 @@ class Ant {
         }
         else if (sense[1].sqMagnitude() > 0 && this.action == FINDFOOD) {
             this.action = RETURNFOOD;
-            this.lastPh = 1.0;
+
             this.direction += Math.PI;
         }
         else {
-
+            this.x = frontX;
+            this.y = frontY;
 
             if (this.action == FINDFOOD) {
 
-                this.direction += random() * this.maxTurn;
+
+
             }
             else if (this.action == RETURNFOOD) {
 
-                if (sense[2].sqMagnitude > 0) {
-
-                    this.direction = sense[2].direction();
-
+                if (sense[2].sqMagnitude() > 0) {
+                    this.direction = (sense[2].add(this.dirVector)).direction();
                 }
-
             }
-            this.x = frontX;
-            this.y = frontY;
+            this.direction += random() * this.maxTurn;
         }
 
 
@@ -117,9 +115,11 @@ class Ant {
 
     layHomingPh(i, j) {
         cells[j + i * HEIGHT].homingPh += 0.5;
+        cells[j + i * HEIGHT].homingDirection = cells[j + i * HEIGHT].homingDirection.add(this.dirVector.mul(-1));
     }
     layFoodPh(i, j) {
         cells[j + i * HEIGHT].foodPh += 0.5;
+        cells[j + i * HEIGHT].foodDirection = cells[j + i * HEIGHT].foodDirection.add(this.dirVector.mul(-1));
     }
 
 
@@ -134,29 +134,24 @@ class Ant {
         //var currentCell = this.getCell(i, j, 0, 0);
 
         for (let k = 0; k < selectedCells.length; k++) {
+            var d = new Vec2(selectedCells[k].x - this.x, selectedCells[k].y - this.y);
             if (selectedCells[k].terrain > 0) {
-                terrainDirection.x += selectedCells[k].x - this.x;
-                terrainDirection.y += selectedCells[k].y - this.y;
+                terrainDirection.x += d.x;
+                terrainDirection.y += d.y;
             }
             if (selectedCells[k].food > 0) {
-                foodDirection.x += selectedCells[k].x - this.x;
-                foodDirection.y += selectedCells[k].y - this.y;
+                foodDirection.x += d.x;
+                foodDirection.y += d.y;
             }
             if (selectedCells[k].homingPh > 0) {
-                var d = new Vec2(selectedCells[k].x - this.x, selectedCells[k].y - this.y);
-
-                homingPhDirection.x += d.x * selectedCells[k].homingPh;
-                homingPhDirection.y += d.y * selectedCells[k].homingPh;
-
-
+                homingPhDirection = homingPhDirection.add(selectedCells[k].homingDirection.mul(selectedCells[k].homingPh));
             }
             if (selectedCells[k].foodPh > 0) {
-                foodPhDirection.x += selectedCells[k].x - this.x;
-                foodPhDirection.y += selectedCells[k].y - this.y;
+
             }
         }
 
-        return [terrainDirection, foodDirection, homingPhDirection, foodPhDirection];
+        return [terrainDirection, foodDirection, homingPhDirection.normal(), foodPhDirection.normal()];
 
     }
 
@@ -190,9 +185,11 @@ class Vec2 {
     constructor(x, y) {
         this.x = x;
         this.y = y;
+
     }
     x;
     y;
+
 
     sqMagnitude() {
         return (this.x * this.x + this.y * this.y);
@@ -225,5 +222,8 @@ class Vec2 {
     }
     mul(a) {
         return new Vec2(a * this.x, a * this.y);
+    }
+    add(u) {
+        return new Vec2(u.x + this.x, u.y + this.y);
     }
 }

@@ -249,8 +249,8 @@ class AntLab {
         let j = 0;
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
             if (this.isPlaying) {
-                cells[j].homingPh *= 0.9999;
-                cells[j].foodPh *= 0.995;
+                cells[j].homingPh *= 0.999;
+                cells[j].foodPh *= 0.998;
             }
             this.vertices[i + 3] = cells[j].terrain;
             this.vertices[i + 4] = cells[j].homingPh * 0.8;

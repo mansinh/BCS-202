@@ -1,11 +1,11 @@
-var brushSize = 1;
+var brushSize = 5;
 var brushSizeSlider = document.getElementById("brushSize");
 
 brushSizeSlider.oninput = function () {
     brushSize = parseInt(this.value);
 }
 
-var brushDensity = 1;
+var brushDensity = 10;
 var brushDensitySlider = document.getElementById("brushDensity");
 
 brushDensitySlider.oninput = function () {
