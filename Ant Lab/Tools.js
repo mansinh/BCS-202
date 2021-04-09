@@ -25,6 +25,7 @@ class Tools {
             HOME.y = mouseY;
             HOME.selected = true;
         }
+        console.log(HOME.selected);
     }
 
 
@@ -48,6 +49,9 @@ class Tools {
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
                 selectedCells[i].terrain = 1;
+                selectedCells[i].homingPh=0;
+                selectedCells[i].foodPh=0;
+                selectedCells[i].food=0;
             }
         }
     }

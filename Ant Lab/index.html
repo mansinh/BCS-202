@@ -6,11 +6,7 @@
     <link rel="stylesheet" type="text/css" href="ant_lab.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script src=" ./antlab.js"></script>
-    <script src=" ./ant.js"></script>
-    <script src=" ./cell.js"></script>
-    <script src=" ./home.js"></script>
-    <script src=" ./shader.js"></script>
+    
     <style></style>
 </head>
 
@@ -47,9 +43,36 @@
         <button id="playButton" onclick="play()">PLAY</button>
         <button onclick="stop()">STOP</button>
         <button onclick="clearCells()">CLEAR</button>
+
+        <div class="slider">
+
+            <input type="range" min="1" max="100" value="10" name="activeAnts" id="activeAnts">
+            <label for="antNumber">active ants</label>
+        </div>
+        <p>Evaporation<p>
+        <div class="slider">
+
+            <input type="range" min="0" max="100" value="50" name="homingEvap" id="homingEvap">
+            <label for="homingEvap">homing Ph</label>
+        </div>
+        <div class="slider">
+
+            <input type="range" min="0" max="100" value="50" name="foodEvap" id="foodEvap">
+            <label for="foodEvap">food Ph</label>
+        </div>
+        <div class="slider">
+
+            <input type="range" min="0" max="20" value="10" name="timeScale" id="timeScale">
+            <label for="timeScale">time scale</label>
+        </div>
+        
     </div>
     <script src=" ./tools.js"></script>
-
+    <script src=" ./antlab.js"></script>
+    <script src=" ./ant.js"></script>
+    <script src=" ./cell.js"></script>
+    <script src=" ./home.js"></script>
+    <script src=" ./shader.js"></script>
 
     <script src=" ./main.js"></script>
 </body>

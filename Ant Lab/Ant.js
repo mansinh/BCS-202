@@ -8,12 +8,12 @@ class Ant {
         this.y = 0;
         this.direction = 0;
         this.dirVector = new Vec2(0.0, 0.0);
-        this.maxSpeed = 0.1;
-        this.maxTurn = Math.PI / 15;
+        this.maxSpeed = 0.2;
+        this.maxTurn = Math.PI / 10*(1+random()/2);
         this.action = FINDFOOD;
         this.t = 0.0;
-        this.senseRange = 2;
-        this.lastPh = 1.0;
+        this.senseRange = 3;
+      
     }
     x;
     y;
@@ -62,35 +62,43 @@ class Ant {
 
 
         var sense = this.sense(i, j);
-        if (sense[0].sqMagnitude() > 0) {
+        var terrainCollision = this.terrainCollision(i,j);
+        if (terrainCollision[0].sqMagnitude() > 0) {
 
-            var terrainNormal = sense[0].normal();
+            var terrainNormal = terrainCollision[0].normal();
             var spin = this.dirVector.x * terrainNormal.y - this.dirVector.y * terrainNormal.x;
             var terrainTangent = terrainNormal.perp(spin);
             this.x -= this.dirVector.x * dt * this.maxSpeed;
             this.y -= this.dirVector.y * dt * this.maxSpeed;
-            this.direction = terrainTangent.direction() + random() * this.maxTurn;
+            this.direction = terrainTangent.direction();
 
         }
-        else if (sense[1].sqMagnitude() > 0 && this.action == FINDFOOD) {
+        else if (terrainCollision[1].sqMagnitude() > 0 && this.action == FINDFOOD) {
             this.action = RETURNFOOD;
 
-            this.direction += Math.PI;
+            
         }
         else {
             this.x = frontX;
             this.y = frontY;
 
             if (this.action == FINDFOOD) {
-
-
-
+                if (sense[1].sqMagnitude() > 0) {
+                    this.direction = (sense[1].add(this.dirVector)).direction();
+                }
+                
             }
             else if (this.action == RETURNFOOD) {
 
-                if (sense[2].sqMagnitude() > 0) {
-                    this.direction = (sense[2].add(this.dirVector)).direction();
+                if (sense[0].sqMagnitude() > 0) {
+                    this.direction = (sense[0].add(this.dirVector)).direction();
                 }
+                //console.log(HOME.collide(this.x,this.y));
+                if(HOME.collide(this.x,this.y)){
+                    this.action = FINDFOOD;
+                    this.direction += random()*Math.PI*2;
+                }
+                
             }
             this.direction += random() * this.maxTurn;
         }
@@ -106,6 +114,7 @@ class Ant {
                     this.layFoodPh(i, j);
                     break;
             }
+            
         }
         // this.t = 0.0;
         //}
@@ -114,25 +123,18 @@ class Ant {
     }
 
     layHomingPh(i, j) {
-        cells[j + i * HEIGHT].homingPh += 0.5;
+        cells[j + i * HEIGHT].homingPh +=1;
         cells[j + i * HEIGHT].homingDirection = cells[j + i * HEIGHT].homingDirection.add(this.dirVector.mul(-1));
     }
     layFoodPh(i, j) {
-        cells[j + i * HEIGHT].foodPh += 0.5;
+        cells[j + i * HEIGHT].foodPh += 1;
         cells[j + i * HEIGHT].foodDirection = cells[j + i * HEIGHT].foodDirection.add(this.dirVector.mul(-1));
     }
 
-
-    sense(i, j) {
-
-        var selectedCells = this.getCells(i, j, this.senseRange);
+    terrainCollision(i,j){
+        var selectedCells = this.getCells(i, j, 1);
         var terrainDirection = new Vec2(0.0, 0.0);
         var foodDirection = new Vec2(0.0, 0.0);
-        var homingPhDirection = new Vec2(0.0, 0.0);
-        var foodPhDirection = new Vec2(0.0, 0.0);
-
-        //var currentCell = this.getCell(i, j, 0, 0);
-
         for (let k = 0; k < selectedCells.length; k++) {
             var d = new Vec2(selectedCells[k].x - this.x, selectedCells[k].y - this.y);
             if (selectedCells[k].terrain > 0) {
@@ -143,15 +145,34 @@ class Ant {
                 foodDirection.x += d.x;
                 foodDirection.y += d.y;
             }
+        }
+
+        return [terrainDirection,foodDirection];
+
+    }
+
+    sense(i, j) {
+
+        var selectedCells = this.getCells(i, j, this.senseRange);
+        
+       
+        var homingPhDirection = new Vec2(0.0, 0.0);
+        var foodPhDirection = new Vec2(0.0, 0.0);
+
+        //var currentCell = this.getCell(i, j, 0, 0);
+
+        for (let k = 0; k < selectedCells.length; k++) {
+            var d = new Vec2(selectedCells[k].x - this.x, selectedCells[k].y - this.y);
+            
             if (selectedCells[k].homingPh > 0) {
                 homingPhDirection = homingPhDirection.add(selectedCells[k].homingDirection.mul(selectedCells[k].homingPh));
             }
             if (selectedCells[k].foodPh > 0) {
-
+                foodPhDirection = foodPhDirection.add(selectedCells[k].foodDirection.mul(selectedCells[k].foodPh));
             }
         }
 
-        return [terrainDirection, foodDirection, homingPhDirection.normal(), foodPhDirection.normal()];
+        return [homingPhDirection.normal(), foodPhDirection.normal()];
 
     }
 

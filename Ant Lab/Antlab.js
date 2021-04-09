@@ -3,9 +3,31 @@ const ERASE_TOOL = 2;
 const FOOD_TOOL = 3;
 const HAND_TOOL = 0;
 
-const ANT_COUNT = 1;
-const WIDTH = 256;
-const HEIGHT = 256;
+const ANT_COUNT = 100;
+var activeAnts = 10;
+var activeAntsSlider = document.getElementById("activeAnts");
+activeAntsSlider.oninput = function () {
+    activeAnts = this.value;
+}
+
+var foodEvaporation =50;
+var foodEvapSlider = document.getElementById("foodEvap");
+foodEvapSlider.oninput = function () {
+    foodEvaporation = parseFloat(this.value);
+}
+var homingEvaporation = 50;
+var homingEvapSlider = document.getElementById("homingEvap");
+homingEvapSlider.oninput = function () {
+    homingEvaporation = parseFloat(this.value);
+}
+var timeScale = 1.0;
+var timeScaleSlider = document.getElementById("timeScale");
+timeScaleSlider.oninput = function () {
+    timeScale = parseFloat(this.value)/10;
+}
+
+const WIDTH = 200;
+const HEIGHT = 200;
 
 var ants = [];
 var cells = [];
@@ -238,7 +260,7 @@ class AntLab {
 
     updateAnts() {
         let j = 0;
-        for (let i = 0; i < ants.length; i++) {
+        for (let i = 0; i < activeAnts; i++) {
             ants[i].update(this.dt);
 
             this.updateAntVertices(i, j);
@@ -263,14 +285,22 @@ class AntLab {
 
     updateCells() {
         let j = 0;
+        console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
+            cells[j].foodPh=Math.min(cells[j].foodPh,10);
+            cells[j].homingPh=Math.min(cells[j].homingPh,10);
             if (this.isPlaying) {
-                cells[j].homingPh *= 0.999;
-                cells[j].foodPh *= 0.998;
+                if(cells[j].homingPh>=0){
+                cells[j].homingPh -= homingEvaporation/500*this.dt ;
+                }
+                if(cells[j].foodPh>=0){
+                cells[j].foodPh -= foodEvaporation/500*this.dt;
+                }
+                
             }
             this.vertices[i + 3] = cells[j].terrain;
-            this.vertices[i + 4] = cells[j].homingPh * 0.8;
-            this.vertices[i + 5] = cells[j].foodPh * 0.8;
+            this.vertices[i + 4] = cells[j].homingPh * 0.5;
+            this.vertices[i + 5] = cells[j].foodPh * 0.5;
             this.vertices[i + 6] = cells[j].food;
             j++;
         }
@@ -285,12 +315,14 @@ class AntLab {
 
         }
         else {
-            let j = 0;
-            for (let i = 0.0; i < ants.length; i++) {
-                ants[i].x = HOME.x;
-                ants[i].y = HOME.y;
-                this.updateAntVertices(i, j)
-                j += STRIDE / FLOAT_SIZE_BYTES;
+            if(HOME.selected){
+                let j = 0;
+                for (let i = 0.0; i < ants.length; i++) {
+                    ants[i].x = HOME.x;
+                    ants[i].y = HOME.y;
+                    this.updateAntVertices(i, j)
+                    j += STRIDE / FLOAT_SIZE_BYTES;
+                }
             }
         }
     }
@@ -339,7 +371,7 @@ class AntLab {
 
     update() {
         var now = performance.now();
-        this.dt = (now - this.then) * 0.001;
+        this.dt = (now - this.then) * 0.001*timeScale;
         this.then = now;
         if (!document.hasFocus()) {
             this.isPlaying = false;
@@ -351,7 +383,7 @@ class AntLab {
             this.updateAnts();
         }
         this.updateCells();
-        //this.updateHome();
+        this.updateHome();
         this.draw();
 
 

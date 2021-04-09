@@ -34,7 +34,7 @@ function clearTools() {
 
 function onHandTool() {
     this.clearTools();
-    this.selectedTool = HAND_TOOL;
+    ANT_LAB.selectedTool = HAND_TOOL;
     document.getElementById("handTool").style.backgroundColor = "grey";
     document.getElementById("handTool").style.color = "white";
 }
