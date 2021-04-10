@@ -1,0 +1,55 @@
+body{
+    margin:0px;
+    width:100%;
+    overflow: hidden;
+    
+}
+
+.pallet{
+    width:200px;
+    position: absolute;
+    right: 0px;
+    
+
+}
+
+.pallet p{
+   
+    padding-left:15px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+
+.slider{
+    
+     padding-left:15px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: white;
+}
+
+
+.slider input{
+
+    background-color: white;
+    
+    width: 70px;
+}
+
+.canvas{
+   
+    position: absolute;
+    top: 0px;
+
+}
+.canvasHolder{
+    left:0px;
+    position: absolute;
+    top: 0px;
+}
+
+button{
+    margin: 10px;
+    width: 70px;
+}

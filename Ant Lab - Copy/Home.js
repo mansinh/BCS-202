@@ -4,7 +4,6 @@ class Home {
     }
     x;
     y;
-   
     foodCollected;
     size;
     selected;
@@ -12,7 +11,6 @@ class Home {
     init() {
         this.x = 0.1;
         this.y = 0.5;
-        
         this.foodCollected = 0;
         this.size = 5/WIDTH;
         this.selected = false;
