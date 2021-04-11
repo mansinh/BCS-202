@@ -4,18 +4,18 @@ const FOOD_TOOL = 3;
 const HAND_TOOL = 0;
 
 const ANT_COUNT = 100;
-var activeAnts = 10;
+var activeAnts = 1;
 var activeAntsSlider = document.getElementById("activeAnts");
 activeAntsSlider.oninput = function () {
     activeAnts = this.value;
 }
 
-var foodEvaporation =50;
+var foodEvaporation =0;
 var foodEvapSlider = document.getElementById("foodEvap");
 foodEvapSlider.oninput = function () {
     foodEvaporation = parseFloat(this.value);
 }
-var homingEvaporation = 25;
+var homingEvaporation = 0;
 var homingEvapSlider = document.getElementById("homingEvap");
 homingEvapSlider.oninput = function () {
     homingEvaporation = parseFloat(this.value);
@@ -136,9 +136,7 @@ class AntLab {
 
         for (let i = 0; i < ANT_COUNT * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
             let newAnt = new Ant();
-            newAnt.x = HOME.x;
-            newAnt.y = HOME.y;
-            newAnt.direction = random() * Math.PI * 2;
+            newAnt.init();
             ants.push(newAnt);
         }
     }
@@ -155,8 +153,11 @@ class AntLab {
         }
     }
 
+    vertices = [];
+    vertexDataBuffer;
+
     createVertices() {
-        this.vertices = [];
+        
         for (let i = 0.0; i < cells.length; i++) {
             //positions
             this.vertices.push(cells[i].x);
@@ -176,6 +177,7 @@ class AntLab {
             //positions
             this.vertices.push(ants[i].x);
             this.vertices.push(ants[i].y);
+        
             this.vertices.push(1.0);
 
             //color
@@ -184,13 +186,10 @@ class AntLab {
             this.vertices.push(0.5);
             this.vertices.push(1.0);
         }
-
-
-        this.vertices.push(HOME.x);
-        this.vertices.push(HOME.y);
-        this.vertices.push(2.0);
-
-        //console.log("home " + this.vertices[(ANT_COUNT + cells.length) * 7]);
+        this.vertices.push(0);
+        this.vertices.push(0);
+    
+        this.vertices.push(1.0);
 
         //color
         this.vertices.push(Math.random());
@@ -198,10 +197,23 @@ class AntLab {
         this.vertices.push(0.5);
         this.vertices.push(1.0);
 
+        this.vertices.push(HOME.x);
+        this.vertices.push(HOME.y);
+    
+        this.vertices.push(1.0);
+
+        //color
+        this.vertices.push(Math.random());
+        this.vertices.push(Math.random());
+        this.vertices.push(0.5);
+        this.vertices.push(1.0);
+
+       
+
 
         this.vertexDataBuffer = GL.createBuffer();
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer)
-        GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(this.vertices), GL.STATIC_DRAW);
+        GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(this.vertices), GL.DYNAMIC_DRAW);
 
     }
 
@@ -220,10 +232,7 @@ class AntLab {
     stop() {
         this.isPlaying = false;
         for (let i = 0.0; i < ants.length; i++) {
-            ants[i].direction = random() * Math.PI * 2;
-            ants[i].x = HOME.x;
-            ants[i].y = HOME.y;
-            ants[i].action = FINDFOOD;
+            ants[i].init();
         }
         for (let i = 0.0; i < cells.length; i++) {
             cells[i].foodPh = 0;
@@ -272,6 +281,7 @@ class AntLab {
             this.updateAntVertices(i, j);
             j += STRIDE / FLOAT_SIZE_BYTES;
         }
+        
     }
     updateAntVertices(i, j) {
 
@@ -281,7 +291,7 @@ class AntLab {
         this.vertices[j + 3 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[j + 4 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
         this.vertices[j + 5 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
-        this.vertices[j + 6 + length * STRIDE / FLOAT_SIZE_BYTES] = 2;
+        this.vertices[j + 6 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
 
     }
 
@@ -297,10 +307,10 @@ class AntLab {
             cells[j].homingPh=Math.min(cells[j].homingPh,5);
             if (this.isPlaying) {
                 if(cells[j].homingPh>=0){
-                cells[j].homingPh -= homingEvaporation/500*this.dt ;
+                cells[j].homingPh -= homingEvaporation/100*this.dt ;
                 }
                 if(cells[j].foodPh>=0){
-                cells[j].foodPh -= foodEvaporation/500*this.dt;
+                cells[j].foodPh -= foodEvaporation/100*this.dt;
                 }
                 
             }
@@ -313,9 +323,14 @@ class AntLab {
     }
 
     updateHome() {
-        let homeIndex = (cells.length + ANT_COUNT) * 7;
-        this.vertices[homeIndex] = HOME.x;
-        this.vertices[homeIndex + 1] = HOME.y;
+        var length = cells.length+ANT_COUNT;
+        this.vertices[length * STRIDE / FLOAT_SIZE_BYTES] = HOME.x;
+        this.vertices[1 + length * STRIDE / FLOAT_SIZE_BYTES] = HOME.y;
+        this.vertices[3 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
+        this.vertices[4 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
+        this.vertices[5 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
+        this.vertices[6 + length * STRIDE / FLOAT_SIZE_BYTES] = 2;
+        
         //console.log("home pos " + this.vertices[homeIndex] + " " + this.vertices[homeIndex + 1]);
         if (this.isPlaying) {
 
@@ -333,9 +348,7 @@ class AntLab {
         }
     }
 
-    vertices = [];
-    vertexDataBuffer;
-
+    
 
     setShaderProperties() {
         GL.useProgram(this.shader.program);
@@ -347,11 +360,7 @@ class AntLab {
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer)
         GL.vertexAttribPointer(this.shader.propertyLocationColor, 4, GL.FLOAT, false, STRIDE, VERTEX_COLOR_OFFSET);
 
-        GL.vertexAttrib1f(this.shader.propertyLocationPointSize, 1);
-
-        GL.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
-        GL.enable(GL.BLEND);
-
+       
     }
 
 
@@ -394,10 +403,6 @@ class AntLab {
         this.updateHome();
 
         this.draw();
-
-
-        //console.log(this.dt)
-        //this.totalTime += this.dt;
         document.getElementById("fps").innerHTML = "" + parseInt(1 / this.dt) + " FPS";
 
 
@@ -411,12 +416,9 @@ class AntLab {
         GL.clear(GL.COLOR_BUFFER_BIT);
 
         GL.bufferSubData(GL.ARRAY_BUFFER, 0, new Float32Array(this.vertices));
-        GL.drawArrays(GL.POINTS, 0, ANT_COUNT + cells.length);
-
+        GL.drawArrays(GL.POINTS, 0, ANT_COUNT + cells.length +1);
+   
+    
     }
-
-
-
-
 
 }

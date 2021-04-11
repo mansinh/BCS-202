@@ -15,8 +15,11 @@ const VERTEX_SRC =
             
            gl_Position = position;
            
-           if(position.z == 1.0){
-                gl_PointSize = 3.0;
+         if(position.z == 1.0){
+              gl_PointSize = 3.0;
+              if(color.a == 2.0){
+                gl_PointSize = 15.0;
+              }
            }
            else if(position.z == 0.0){
                if(color.r > 0.0){
@@ -28,9 +31,6 @@ const VERTEX_SRC =
                else{
                  gl_PointSize = 2.0;
                }
-           }
-           else {
-               gl_PointSize = 5.0;
            }
      
            linkedColor = color;

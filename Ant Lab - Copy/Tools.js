@@ -20,7 +20,7 @@ class Tools {
 
 
     handTool(mouseX, mouseY) {
-        if (HOME.collide(mouseX, mouseY) || HOME.selected == true) {
+        if ((HOME.collide(mouseX, mouseY) || HOME.selected == true) && !ANT_LAB.isPlaying) {
             HOME.x = mouseX;
             HOME.y = mouseY;
             HOME.selected = true;
