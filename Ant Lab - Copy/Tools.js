@@ -34,9 +34,9 @@ class Tools {
             console.log("fling " + flingVelocity + " " + flingVelocity.sqMagnitude());
             if (flingVelocity.sqMagnitude() > 0.0001) {
                 console.log("FLING");
-                this.selectedAnt.vx = flingVelocity.normal().x * 2;
-                this.selectedAnt.vy = flingVelocity.normal().y * 2;
-                this.selectedAnt.vz = flingVelocity.magnitude() / 10;
+                this.selectedAnt.vx = flingVelocity.normal().x;
+                this.selectedAnt.vy = flingVelocity.normal().y;
+                this.selectedAnt.vz = flingVelocity.magnitude() / 4;
             }
             this.position = new Vec2(0.0, 0.0);
             this.lastPosition = new Vec2(0.0, 0.0);
@@ -86,7 +86,7 @@ class Tools {
 
     squishTool(mouseX, mouseY) {
         for (let i = 0; i < ants.length; i++) {
-            var squishRadius = brushSize / WIDTH;
+            var squishRadius = brushSize / WIDTH * 2;
             if (squishRadius * squishRadius > ants[i].sqDistance(mouseX, mouseY)) {
                 ants[i].squish();
             }

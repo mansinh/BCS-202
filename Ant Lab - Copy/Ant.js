@@ -11,9 +11,9 @@ class Ant {
         this.vy = 0;
         this.vz = 0;
         this.direction = new Vec2(0.0, 0.0);
-        this.maxSpeed = 0.2;
+        this.maxSpeed = 0.1;
         this.maxTurn = Math.PI / 20;
-        this.size = 5 / WIDTH;
+        this.size = 10 / WIDTH;
         this.action = FINDFOOD;
         this.t = 0.0;
         this.senseRange = 2;
@@ -34,6 +34,7 @@ class Ant {
         this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
         this.action = FINDFOOD;
         this.color.toWhite();
+        this.timeActive = 0;
     }
     x; y; z;
     vx; vy; vz;
@@ -41,18 +42,20 @@ class Ant {
     action; //0=findFood, 1=foodFound1, 2 = ...,
     selected;
     color;
+    timeActive; index;
 
     update(dt, isPlaying) {
+        this.timeActive += dt;
         if (!this.selected) {
             if (this.squished) {
-                this.color.fade(2, dt);
+                this.color.fadeToBlack(2, dt);
                 if (this.color.a <= 0) {
                     this.init();
                     this.squished = false;
                 }
 
             }
-            else if (this.z <= 0 && this.vx == 0 && this.vy == 0 && this.vz == 0) {
+            else if (this.vx == 0 && this.vy == 0 && this.vz == 0) {
 
                 if (isPlaying) {
                     this.behaviour(dt)
@@ -61,8 +64,8 @@ class Ant {
             else {
                 this.vz += -GRAVITY * dt;
                 this.z += this.vz;
-                if (this.z < 0) {
-                    this.vz = -this.vz * 0.7;
+                if (this.z <= 0) {
+                    this.vz = -this.vz * 0.6;
                     this.vy = this.vy * 0.9;
                     this.vx = this.vx * 0.9;
                     this.z = 0;
@@ -83,9 +86,9 @@ class Ant {
                     this.y = 1;
                     this.vy = -this.vy;
                 }
-                if (Math.abs(this.vz) < 0.0001) {
+                if (Math.abs(this.vz) < 0.001) {
                     this.vz = 0;
-                    this.z = 0;
+
                 }
                 if (Math.abs(this.vy) < 0.001) {
                     this.vy = 0;
@@ -170,6 +173,10 @@ class Ant {
         this.direction = this.direction.normal();
         this.x += this.direction.x * this.maxSpeed * dt;
         this.y += this.direction.y * this.maxSpeed * dt;
+
+        //this.z = (Math.sin(this.timeActive * 60 + this.index / ANT_COUNT * Math.PI) + 1) / 4 / HEIGHT;
+        this.z = 2 * Math.random() / HEIGHT;
+
 
         if (j + i * HEIGHT < cells.length && j + i * HEIGHT > 0) {
             switch (this.action) {
@@ -302,6 +309,12 @@ class Color {
         this.b = 1.0;
         this.a = 1.0;
     }
+    toBlack() {
+        this.r = 0.0;
+        this.g = 0.0;
+        this.b = 0.0;
+        this.a = 0.0;
+    }
     toRandom() {
         this.r = Math.random();
         this.g = Math.random();
@@ -314,7 +327,7 @@ class Color {
         this.b = 0;
         this.a = 1.0;
     }
-    fade(fadeTime, dt) {
+    fadeToBlack(fadeTime, dt) {
         this.r = Math.max(0, this.r - dt / fadeTime);
         this.g = Math.max(0, this.g - dt / fadeTime);
         this.b = Math.max(0, this.b - dt / fadeTime);
@@ -322,6 +335,15 @@ class Color {
 
 
     }
+    fadeToWhite(fadeTime, dt) {
+        this.r = Math.min(1, this.r + dt / fadeTime);
+        this.g = Math.min(1, this.g + dt / fadeTime);
+        this.b = Math.main(1, this.b + dt / fadeTime);
+        this.a = Math.min(1, this.a + dt / fadeTime);
+
+
+    }
+
 
 }
 

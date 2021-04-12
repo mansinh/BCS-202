@@ -30,8 +30,8 @@ timeScaleSlider.oninput = function () {
     timeScale = parseFloat(this.value);
 }
 
-const WIDTH = 200;
-const HEIGHT = 200;
+const WIDTH = 300;
+const HEIGHT = 300;
 
 var ants = [];
 var cells = [];
@@ -46,7 +46,7 @@ class AntLab {
         this.totalTime = 0.0;
 
         this.then = 0.0;
-        this.dt = 0.0;
+        this.dt = 1 / 30;
         this.isPlaying = false;
 
         this.usingTool = false;
@@ -147,6 +147,7 @@ class AntLab {
 
         for (let i = 0; i < ANT_COUNT * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
             let newAnt = new Ant();
+            newAnt.index = i;
             newAnt.init();
             ants.push(newAnt);
         }
@@ -281,8 +282,9 @@ class AntLab {
 
     update() {
         var now = performance.now();
-        this.dt = (now - this.then) / 1000;
+        var deltaTime = (now - this.then) / 1000;
         this.then = now;
+
         if (!document.hasFocus()) {
             this.isPlaying = false;
             document.getElementById("playButton").innerHTML = "PLAY";
@@ -298,7 +300,7 @@ class AntLab {
         this.updateHome();
 
         this.draw();
-        document.getElementById("fps").innerHTML = "" + parseInt(1 / this.dt) + " FPS";
+        document.getElementById("fps").innerHTML = "" + parseInt(1 / deltaTime) + " FPS";
         requestAnimationFrame(() => { this.update() });
     }
 
@@ -331,8 +333,8 @@ class AntLab {
         let j = 0;
         //console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-            cells[j].foodPh = Math.min(cells[j].foodPh, 5);
-            cells[j].homingPh = Math.min(cells[j].homingPh, 5);
+            cells[j].foodPh = Math.min(cells[j].foodPh, 10);
+            cells[j].homingPh = Math.min(cells[j].homingPh, 10);
             if (this.isPlaying) {
                 if (cells[j].homingPh >= 0) {
                     cells[j].homingPh -= homingEvaporation / 100 * this.dt;
@@ -343,8 +345,8 @@ class AntLab {
 
             }
             this.vertices[i + 3] = cells[j].obstacle;
-            this.vertices[i + 4] = cells[j].homingPh * 0.2;
-            this.vertices[i + 5] = cells[j].foodPh * 0.2;
+            this.vertices[i + 4] = cells[j].homingPh * 0.1;
+            this.vertices[i + 5] = cells[j].foodPh * 0.1;
             this.vertices[i + 6] = cells[j].food;
             j++;
         }
