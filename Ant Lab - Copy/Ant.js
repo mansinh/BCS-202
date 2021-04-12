@@ -18,6 +18,9 @@ class Ant {
         this.t = 0.0;
         this.senseRange = 2;
         this.selected = false;
+        this.color = new Color();
+        this.squished = false;
+        //console.log(this.color);
     }
 
     init() {
@@ -30,19 +33,26 @@ class Ant {
         var angle = random() * Math.PI * 2;
         this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
         this.action = FINDFOOD;
+        this.color.toWhite();
     }
     x; y; z;
     vx; vy; vz;
-
     direction; maxSpeed; maxTurn; size; senseRange;
-
     action; //0=findFood, 1=foodFound1, 2 = ...,
-
     selected;
+    color;
 
     update(dt, isPlaying) {
         if (!this.selected) {
-            if (this.z <= 0 && this.vx == 0 && this.vy == 0 && this.vz == 0) {
+            if (this.squished) {
+                this.color.fade(2, dt);
+                if (this.color.a <= 0) {
+                    this.init();
+                    this.squished = false;
+                }
+
+            }
+            else if (this.z <= 0 && this.vx == 0 && this.vy == 0 && this.vz == 0) {
 
                 if (isPlaying) {
                     this.behaviour(dt)
@@ -92,9 +102,6 @@ class Ant {
 
     behaviour(dt) {
         this.t += dt;
-
-
-
         if (this.x > 1.0) {
             this.direction.x = - this.direction.x;
             this.x = 1.0;
@@ -111,12 +118,8 @@ class Ant {
             this.direction.y = - this.direction.y;
             this.y = -1.0;
         }
-
-
         var i = Math.min(parseInt((this.x + 1.0) * WIDTH / 2), WIDTH - 1);
         var j = Math.min(parseInt((this.y + 1.0) * HEIGHT / 2), HEIGHT - 1);
-
-
         var neighbours = this.getCells(i, j, this.senseRange);
         //console.log(neighbours.length);
         var foodCells = [];
@@ -125,8 +128,6 @@ class Ant {
                 foodCells.push(neighbours[k]);
             }
         }
-
-
 
         if (this.action == FINDFOOD) {
             if (this.getCell(i, j).food > 0) {
@@ -170,7 +171,6 @@ class Ant {
         this.x += this.direction.x * this.maxSpeed * dt;
         this.y += this.direction.y * this.maxSpeed * dt;
 
-        // if (this.t > 0.05) {
         if (j + i * HEIGHT < cells.length && j + i * HEIGHT > 0) {
             switch (this.action) {
                 case 0:
@@ -182,10 +182,6 @@ class Ant {
             }
 
         }
-        // this.t = 0.0;
-        //}
-
-
     }
 
     layHomingPh(i, j) {
@@ -200,10 +196,6 @@ class Ant {
         cell.foodPhDirection = cell.foodPhDirection.add(this.direction.mul(-1));
 
     }
-
-
-
-
 
     getCells(x, y, size) {
         var selectedCells = [];
@@ -227,11 +219,22 @@ class Ant {
     }
 
     collide(x, y) {
-        var dx = x - this.x;
-        var dy = y - this.y;
-        return this.size * this.size > dx * dx + dy * dy;
+        return this.size * this.size > this.sqDistance(x, y);
     }
 
+    sqDistance(x, y) {
+        var dx = x - this.x;
+        var dy = y - this.y;
+        return dx * dx + dy * dy
+    }
+
+    squished;
+    squish() {
+        if (!this.squished) {
+            this.color.toRed();
+            this.squished = true;
+        }
+    }
 }
 
 
@@ -243,7 +246,6 @@ class Vec2 {
     }
     x;
     y;
-
 
     sqMagnitude() {
         return (this.x * this.x + this.y * this.y);
@@ -281,3 +283,45 @@ class Vec2 {
         return new Vec2(u.x + this.x, u.y + this.y);
     }
 }
+
+class Color {
+    constructor() {
+        this.r = 0.0;
+        this.g = 0.0;
+        this.b = 0.0;
+        this.a = 1.0;
+    }
+    r;
+    g;
+    b;
+    a;
+
+    toWhite() {
+        this.r = 1.0;
+        this.g = 1.0;
+        this.b = 1.0;
+        this.a = 1.0;
+    }
+    toRandom() {
+        this.r = Math.random();
+        this.g = Math.random();
+        this.b = Math.random();
+        this.a = 1.0;
+    }
+    toRed() {
+        this.r = 0.5;
+        this.g = 0;
+        this.b = 0;
+        this.a = 1.0;
+    }
+    fade(fadeTime, dt) {
+        this.r = Math.max(0, this.r - dt / fadeTime);
+        this.g = Math.max(0, this.g - dt / fadeTime);
+        this.b = Math.max(0, this.b - dt / fadeTime);
+        this.a = Math.max(0, this.a - dt / fadeTime);
+
+
+    }
+
+}
+

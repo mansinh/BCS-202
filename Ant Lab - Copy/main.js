@@ -5,7 +5,7 @@ CANVAS.height = window.innerHeight;
 const ASPECT_RATIO_WIDTH_MULTIPLIER = CANVAS.clientWidth / CANVAS.clientHeight;
 const ANT_LAB = new AntLab();
 ANT_LAB.init();
-onHandTool();
+onPickupTool();
 
 function play() {
     ANT_LAB.play();
@@ -29,17 +29,25 @@ function clearTool(tool) {
     document.getElementById(tool).style.color = "black";
 }
 function clearTools() {
-    this.clearTool("handTool");
-    this.clearTool("terrainTool");
+    this.clearTool("pickupTool");
+    this.clearTool("squishTool");
+    this.clearTool("obstacleTool");
     this.clearTool("eraseTool");
     this.clearTool("foodTool");
 }
 
-function onHandTool() {
+function onPickupTool() {
     this.clearTools();
-    ANT_LAB.selectedTool = HAND_TOOL;
-    document.getElementById("handTool").style.backgroundColor = "grey";
-    document.getElementById("handTool").style.color = "white";
+    ANT_LAB.selectedTool = PICKUP_TOOL;
+    document.getElementById("pickupTool").style.backgroundColor = "grey";
+    document.getElementById("pickupTool").style.color = "white";
+}
+
+function onSquishTool() {
+    this.clearTools();
+    ANT_LAB.selectedTool = SQUISH_TOOL;
+    document.getElementById("squishTool").style.backgroundColor = "grey";
+    document.getElementById("squishTool").style.color = "white";
 }
 
 function onFoodTool() {
@@ -49,11 +57,11 @@ function onFoodTool() {
     document.getElementById("foodTool").style.color = "white";
 }
 
-function onTerrainTool() {
+function onObstacleTool() {
     this.clearTools();
-    ANT_LAB.selectedTool = TERRAIN_TOOL;
-    document.getElementById("terrainTool").style.backgroundColor = "grey";
-    document.getElementById("terrainTool").style.color = "white";
+    ANT_LAB.selectedTool = OBSTACLE_TOOL;
+    document.getElementById("obstacleTool").style.backgroundColor = "grey";
+    document.getElementById("obstacleTool").style.color = "white";
 }
 
 function onEraseTool() {

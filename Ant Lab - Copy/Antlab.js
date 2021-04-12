@@ -1,7 +1,9 @@
-const TERRAIN_TOOL = 1;
+const OBSTACLE_TOOL = 1;
+
 const ERASE_TOOL = 2;
 const FOOD_TOOL = 3;
-const HAND_TOOL = 0;
+const PICKUP_TOOL = 0;
+const SQUISH_TOOL = 4;
 
 const ANT_COUNT = 100;
 const GRAVITY = 1 / 10;
@@ -110,7 +112,7 @@ class AntLab {
         GL.clearColor(0, 0, 0, 1);
 
         this.createAnts();
-        this.createTerrain();
+        this.createCells();
         this.createVertices();
         this.setShaderProperties();
         this.update();
@@ -122,11 +124,14 @@ class AntLab {
         if (this.usingTool) {
 
             switch (this.selectedTool) {
-                case HAND_TOOL:
-                    this.tools.handTool(this.mousePosition.x, this.mousePosition.y);
+                case PICKUP_TOOL:
+                    this.tools.pickupTool(this.mousePosition.x, this.mousePosition.y);
                     break;
-                case TERRAIN_TOOL:
-                    this.tools.drawTerrain(this.mousePosition.x, this.mousePosition.y);
+                case SQUISH_TOOL:
+                    this.tools.squishTool(this.mousePosition.x, this.mousePosition.y);
+                    break;
+                case OBSTACLE_TOOL:
+                    this.tools.drawObstacle(this.mousePosition.x, this.mousePosition.y);
                     break;
                 case FOOD_TOOL:
                     this.tools.drawFood(this.mousePosition.x, this.mousePosition.y);
@@ -148,7 +153,7 @@ class AntLab {
     }
 
 
-    createTerrain() {
+    createCells() {
         for (let i = 0.0; i < WIDTH; i++) {
             for (let j = 0.0; j < HEIGHT; j++) {
                 let newCell = new Cell();
@@ -171,7 +176,7 @@ class AntLab {
             this.vertices.push(0.0);
 
             //color
-            this.vertices.push(cells[i].terrain);
+            this.vertices.push(cells[i].obstacle);
             this.vertices.push(cells[i].homingPh);
             this.vertices.push(cells[i].foodPh);
             this.vertices.push(cells[i].food);
@@ -187,9 +192,9 @@ class AntLab {
             this.vertices.push(1.0);
 
             //color
-            this.vertices.push(Math.random());
-            this.vertices.push(Math.random());
-            this.vertices.push(0.5);
+            this.vertices.push(1);
+            this.vertices.push(1);
+            this.vertices.push(1);
             this.vertices.push(1.0);
         }
         this.vertices.push(0);
@@ -198,8 +203,8 @@ class AntLab {
         this.vertices.push(1.0);
 
         //color
-        this.vertices.push(Math.random());
-        this.vertices.push(Math.random());
+        this.vertices.push(1);
+        this.vertices.push(1);
         this.vertices.push(0.5);
         this.vertices.push(1.0);
 
@@ -209,8 +214,8 @@ class AntLab {
         this.vertices.push(1.0);
 
         //color
-        this.vertices.push(Math.random());
-        this.vertices.push(Math.random());
+        this.vertices.push(1);
+        this.vertices.push(1);
         this.vertices.push(0.5);
         this.vertices.push(1.0);
 
@@ -257,7 +262,7 @@ class AntLab {
     clearCells() {
         console.log("CLEAR");
         for (let i = 0.0; i < cells.length; i++) {
-            cells[i].terrain = 0;
+            cells[i].obstacle = 0;
             cells[i].food = 0;
             cells[i].foodPh = 0;
             cells[i].homingPh = 0;
@@ -267,7 +272,7 @@ class AntLab {
     fillCells() {
         console.log("FILL");
         for (let i = 0.0; i < cells.length; i++) {
-            cells[i].terrain = 1;
+            cells[i].obstacle = 1;
             cells[i].food = 0;
             cells[i].foodPh = 0;
             cells[i].homingPh = 0;
@@ -311,9 +316,9 @@ class AntLab {
         var length = cells.length;
         this.vertices[j + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].x;
         this.vertices[j + 1 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].y + ants[i].z;
-        this.vertices[j + 3 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
-        this.vertices[j + 4 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
-        this.vertices[j + 5 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
+        this.vertices[j + 3 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color.r;
+        this.vertices[j + 4 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color.g;
+        this.vertices[j + 5 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color.b;
         this.vertices[j + 6 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
 
     }
@@ -337,7 +342,7 @@ class AntLab {
                 }
 
             }
-            this.vertices[i + 3] = cells[j].terrain;
+            this.vertices[i + 3] = cells[j].obstacle;
             this.vertices[i + 4] = cells[j].homingPh * 0.2;
             this.vertices[i + 5] = cells[j].foodPh * 0.2;
             this.vertices[i + 6] = cells[j].food;

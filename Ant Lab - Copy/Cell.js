@@ -6,14 +6,14 @@ class Cell {
         this.homingPhDirection = new Vec2(0.0, 0.0);
         this.foodPh = 0;
         this.foodPhDirection = new Vec2(0.0, 0.0);
-        this.terrain = 0;
+        this.obstacle = 0;
         this.food = 0;
     }
     x;
     y;
     homingPh;
     foodPh;
-    terrain;
+    obstacle;
     food;
 
     update() {
