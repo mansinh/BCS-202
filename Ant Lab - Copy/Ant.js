@@ -13,7 +13,7 @@ class Ant {
         this.direction = new Vec2(0.0, 0.0);
         this.maxSpeed = 0.1;
         this.maxTurn = Math.PI / 20;
-        this.size = 10 / WIDTH;
+        this.size = 10 / width;
         this.action = FINDFOOD;
         this.t = 0.0;
         this.senseRange = 2;
@@ -121,8 +121,8 @@ class Ant {
             this.direction.y = - this.direction.y;
             this.y = -1.0;
         }
-        var i = Math.min(parseInt((this.x + 1.0) * WIDTH / 2), WIDTH - 1);
-        var j = Math.min(parseInt((this.y + 1.0) * HEIGHT / 2), HEIGHT - 1);
+        var i = Math.min(parseInt((this.x + 1.0) * width / 2), width - 1);
+        var j = Math.min(parseInt((this.y + 1.0) * height / 2), height - 1);
         var neighbours = this.getCells(i, j, this.senseRange);
         //console.log(neighbours.length);
         var foodCells = [];
@@ -174,11 +174,11 @@ class Ant {
         this.x += this.direction.x * this.maxSpeed * dt;
         this.y += this.direction.y * this.maxSpeed * dt;
 
-        //this.z = (Math.sin(this.timeActive * 60 + this.index / ANT_COUNT * Math.PI) + 1) / 4 / HEIGHT;
-        this.z = 2 * Math.random() / HEIGHT;
+        //this.z = (Math.sin(this.timeActive * 60 + this.index / ANT_COUNT * Math.PI) + 1) / 4 / height;
+        this.z = 2 * Math.random() / 300;
 
 
-        if (j + i * HEIGHT < cells.length && j + i * HEIGHT > 0) {
+        if (j + i * height < cells.length && j + i * height > 0) {
             switch (this.action) {
                 case 0:
                     this.layHomingPh(i, j);
@@ -192,13 +192,13 @@ class Ant {
     }
 
     layHomingPh(i, j) {
-        var cell = cells[j + i * HEIGHT];
+        var cell = cells[j + i * height];
         cell.homingPh += 1;
         cell.homingPhDirection = cell.homingPhDirection.add(this.direction.mul(-1));
 
     }
     layFoodPh(i, j) {
-        var cell = cells[j + i * HEIGHT];
+        var cell = cells[j + i * height];
         cell.foodPh += 1;
         cell.foodPhDirection = cell.foodPhDirection.add(this.direction.mul(-1));
 
@@ -218,7 +218,7 @@ class Ant {
     }
 
     getCell(x, y) {
-        var i = y + x * HEIGHT;
+        var i = y + x * height;
         if (i < cells.length && i > 0) {
             return cells[i];
         }

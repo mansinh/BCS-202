@@ -12,7 +12,7 @@ class Home {
         this.x = 0.1;
         this.y = 0.5;
         this.foodCollected = 0;
-        this.size = 5 / WIDTH;
+        this.size = 10 / 300;
         this.selected = false;
         //console.log(this.size);
     }

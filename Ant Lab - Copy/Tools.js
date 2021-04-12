@@ -3,6 +3,8 @@ var brushSizeSlider = document.getElementById("brushSize");
 
 brushSizeSlider.oninput = function () {
     brushSize = parseInt(this.value);
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("brushSize", "" + this.value);
 }
 
 var brushDensity = 1;
@@ -10,7 +12,8 @@ var brushDensitySlider = document.getElementById("brushDensity");
 
 brushDensitySlider.oninput = function () {
     brushDensity = parseFloat(this.value) / 10 * parseFloat(this.value) / 10 * parseFloat(this.value) / 10;
-
+    this.nextElementSibling.value = parseFloat(this.value / 10);
+    localStorage.setItem("brushDensity", "" + this.value);
 }
 
 class Tools {
@@ -71,7 +74,7 @@ class Tools {
     }
 
     pickupTool(mouseX, mouseY) {
-        console.log(this.selectedAnt);
+        //console.log(this.selectedAnt);
         if (this.selectedAnt == null) {
             if (HOME.selected) {
                 this.moveHome(mouseX, mouseY);
@@ -86,7 +89,7 @@ class Tools {
 
     squishTool(mouseX, mouseY) {
         for (let i = 0; i < ants.length; i++) {
-            var squishRadius = brushSize / WIDTH * 2;
+            var squishRadius = brushSize / width * 2;
             if (squishRadius * squishRadius > ants[i].sqDistance(mouseX, mouseY)) {
                 ants[i].squish();
             }
@@ -105,13 +108,13 @@ class Tools {
         this.selectedAnt.vz = 0;
         this.selectedAnt.vy = 0;
         this.selectedAnt.vx = 0;
-        this.selectedAnt.z = 5 / HEIGHT;
+        this.selectedAnt.z = 5 / height;
     }
 
 
     drawFood(mouseX, mouseY) {
-        var x = Math.min(parseInt((mouseX + 1.0) * WIDTH / 2), WIDTH - 1);
-        var y = Math.min(parseInt((mouseY + 1.0) * HEIGHT / 2), HEIGHT - 1);
+        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
         var selectedCells = this.getCells(x, y);
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
@@ -122,8 +125,8 @@ class Tools {
 
     drawObstacle(mouseX, mouseY) {
 
-        var x = Math.min(parseInt((mouseX + 1.0) * WIDTH / 2), WIDTH - 1);
-        var y = Math.min(parseInt((mouseY + 1.0) * HEIGHT / 2), HEIGHT - 1);
+        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
         var selectedCells = this.getCells(x, y);
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
@@ -136,8 +139,8 @@ class Tools {
     }
 
     erase(mouseX, mouseY) {
-        var x = Math.min(parseInt((mouseX + 1.0) * WIDTH / 2), WIDTH - 1);
-        var y = Math.min(parseInt((mouseY + 1.0) * HEIGHT / 2), HEIGHT - 1);
+        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
         var selectedCells = this.getCells(x, y);
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
@@ -164,7 +167,7 @@ class Tools {
     }
 
     getCell(x, y, a, b) {
-        var i = y + b + (x + a) * HEIGHT;
+        var i = y + b + (x + a) * height;
         if (i < cells.length && i > 0) {
             return cells[i];
         }

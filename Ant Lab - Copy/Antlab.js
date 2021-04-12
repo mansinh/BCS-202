@@ -12,26 +12,34 @@ var activeAnts = 1;
 var activeAntsSlider = document.getElementById("activeAnts");
 activeAntsSlider.oninput = function () {
     activeAnts = this.value;
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("activeAnts", "" + activeAnts);
 }
 
 var foodEvaporation = 0;
 var foodEvapSlider = document.getElementById("foodEvap");
 foodEvapSlider.oninput = function () {
     foodEvaporation = parseFloat(this.value);
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("foodEvap", "" + foodEvaporation);
 }
 var homingEvaporation = 0;
 var homingEvapSlider = document.getElementById("homingEvap");
 homingEvapSlider.oninput = function () {
     homingEvaporation = parseFloat(this.value);
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("homingEvap", "" + homingEvaporation);
 }
 var timeScale = 1.0;
 var timeScaleSlider = document.getElementById("timeScale");
 timeScaleSlider.oninput = function () {
     timeScale = parseFloat(this.value);
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("timeScale", "" + timeScale);
 }
 
-const WIDTH = 300;
-const HEIGHT = 300;
+var width = 300;
+var height = 300;
 
 var ants = [];
 var cells = [];
@@ -115,8 +123,11 @@ class AntLab {
         this.createCells();
         this.createVertices();
         this.setShaderProperties();
+        this.changedSize = false;
         this.update();
     }
+
+
 
     useTool(e) {
 
@@ -155,11 +166,12 @@ class AntLab {
 
 
     createCells() {
-        for (let i = 0.0; i < WIDTH; i++) {
-            for (let j = 0.0; j < HEIGHT; j++) {
+        this.cells = [];
+        for (let i = 0.0; i < width; i++) {
+            for (let j = 0.0; j < height; j++) {
                 let newCell = new Cell();
-                newCell.x = i / WIDTH * 2 - 1 + random() / WIDTH;
-                newCell.y = j / HEIGHT * 2 - 1 + random() / HEIGHT;
+                newCell.x = i / width * 2 - 1 + random() / width;
+                newCell.y = j / height * 2 - 1 + random() / height;
                 cells.push(newCell);
             }
         }
@@ -169,6 +181,7 @@ class AntLab {
     vertexDataBuffer;
 
     createVertices() {
+        this.vertices = [];
 
         for (let i = 0.0; i < cells.length; i++) {
             //positions
@@ -234,10 +247,10 @@ class AntLab {
         this.isPlaying = !this.isPlaying;
         if (this.isPlaying) {
             this.then = performance.now()
-            document.getElementById("playButton").innerHTML = "PAUSE";
+            document.getElementById("playButton").innerHTML = "Pause";
         }
         else {
-            document.getElementById("playButton").innerHTML = "PLAY";
+            document.getElementById("playButton").innerHTML = "Play";
         }
     }
 
@@ -250,7 +263,7 @@ class AntLab {
             cells[i].foodPh = 0;
             cells[i].homingPh = 0;
         }
-        document.getElementById("playButton").innerHTML = "PLAY";
+        document.getElementById("playButton").innerHTML = "Play";
         let j = 0;
         for (let i = 0; i < ants.length; i++) {
             this.updateAntVertices(i, j);
@@ -287,7 +300,7 @@ class AntLab {
 
         if (!document.hasFocus()) {
             this.isPlaying = false;
-            document.getElementById("playButton").innerHTML = "PLAY";
+            document.getElementById("playButton").innerHTML = "Play";
         }
 
         for (let i = 0; i < timeScale; i++) {
@@ -301,7 +314,10 @@ class AntLab {
 
         this.draw();
         document.getElementById("fps").innerHTML = "" + parseInt(1 / deltaTime) + " FPS";
-        requestAnimationFrame(() => { this.update() });
+
+        if (!this.changedSize) {
+            requestAnimationFrame(() => { this.update() });
+        }
     }
 
     updateAnts() {
@@ -337,10 +353,10 @@ class AntLab {
             cells[j].homingPh = Math.min(cells[j].homingPh, 10);
             if (this.isPlaying) {
                 if (cells[j].homingPh >= 0) {
-                    cells[j].homingPh -= homingEvaporation / 100 * this.dt;
+                    cells[j].homingPh -= homingEvaporation / 300 * this.dt;
                 }
                 if (cells[j].foodPh >= 0) {
-                    cells[j].foodPh -= foodEvaporation / 100 * this.dt;
+                    cells[j].foodPh -= foodEvaporation / 300 * this.dt;
                 }
 
             }

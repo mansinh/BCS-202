@@ -4,8 +4,17 @@ CANVAS.width = window.innerWidth - 200;
 CANVAS.height = window.innerHeight;
 const ASPECT_RATIO_WIDTH_MULTIPLIER = CANVAS.clientWidth / CANVAS.clientHeight;
 const ANT_LAB = new AntLab();
+
+loadSettings();
+
 ANT_LAB.init();
 onPickupTool();
+
+var toolsPanel = document.getElementById("tools");
+var settingsPanel = document.getElementById("settings");
+var toolsTab = document.getElementById("toolsTab")
+var settingsTab = document.getElementById("settingsTab")
+showTools();
 
 function play() {
     ANT_LAB.play();
@@ -13,7 +22,6 @@ function play() {
 
 function stop() {
     ANT_LAB.stop();
-
 }
 
 
@@ -24,9 +32,18 @@ function fillCells() {
     ANT_LAB.fillCells();
 }
 
+function applySize() {
+    width = parseInt(document.getElementById("simWidth").value);
+    localStorage.setItem("width", "" + width);
+    height = parseInt(document.getElementById("simHeight").value);
+    localStorage.setItem("height", "" + height);
+    document.location.reload();
+}
+
+
 function clearTool(tool) {
-    document.getElementById(tool).style.backgroundColor = "white";
-    document.getElementById(tool).style.color = "black";
+    document.getElementById(tool).style.backgroundColor = "rgb(40, 40, 40)";
+    document.getElementById(tool).style.color = "rgb(190, 190, 190)";
 }
 function clearTools() {
     this.clearTool("pickupTool");
@@ -71,6 +88,64 @@ function onEraseTool() {
     document.getElementById("eraseTool").style.color = "white";
 }
 
+
+function showTools() {
+    console.log("TOOLS");
+    toolsPanel.style.display = "block";
+    settingsPanel.style.display = "none";
+    settingsTab.style.backgroundColor = "rgb(20,20,20)";
+    toolsTab.style.backgroundColor = "rgb(40,40,40)";
+}
+
+function showSettings() {
+    console.log("SETTINGS");
+
+    toolsPanel.style.display = "none";
+    settingsPanel.style.display = "block";
+    settingsTab.style.backgroundColor = "rgb(40,40,40)";
+    toolsTab.style.backgroundColor = "rgb(20,20,20)";
+}
+
 function random() {
     return Math.random() * 2 - 1;
 }
+
+function loadSettings() {
+    if (localStorage.getItem("brushSize") != null) {
+        brushSize = localStorage.getItem("brushSize");
+        document.getElementById("brushSize").value = brushSize;
+        document.getElementById("brushSize").nextElementSibling.value = brushSize;
+    }
+    if (localStorage.getItem("brushDensity") != null) {
+        brushDensity = Math.pow(parseFloat(localStorage.getItem("brushDensity")) / 10, 3);
+        document.getElementById("brushDensity").value = localStorage.getItem("brushDensity");
+        document.getElementById("brushDensity").nextElementSibling.value = parseFloat(localStorage.getItem("brushDensity") / 10);
+    }
+    if (localStorage.getItem("width") != null) {
+        width = localStorage.getItem("width");
+        height = localStorage.getItem("height");
+        document.getElementById("simWidth").value = width;
+        document.getElementById("simHeight").value = height;
+    }
+    if (localStorage.getItem("activeAnts") != null) {
+        activeAnts = localStorage.getItem("activeAnts");
+        document.getElementById("activeAnts").value = activeAnts;
+        document.getElementById("activeAnts").nextElementSibling.value = activeAnts;
+    }
+    if (localStorage.getItem("foodEvap") != null) {
+        foodEvaporation = localStorage.getItem("foodEvap");
+        document.getElementById("foodEvap").value = foodEvaporation;
+        document.getElementById("foodEvap").nextElementSibling.value = foodEvaporation;
+    }
+    if (localStorage.getItem("homingEvap") != null) {
+        foodEvaporation = localStorage.getItem("homingEvap");
+        document.getElementById("homingEvap").value = homingEvaporation;
+        document.getElementById("homingEvap").nextElementSibling.value = homingEvaporation;
+    }
+    if (localStorage.getItem("timeScale") != null) {
+        timeScale = localStorage.getItem("timeScale");
+        document.getElementById("timeScale").value = timeScale;
+        document.getElementById("timeScale").nextElementSibling.value = timeScale;
+    }
+}
+
