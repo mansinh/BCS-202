@@ -13,7 +13,7 @@ class Ant {
         this.direction = new Vec2(0.0, 0.0);
         this.maxSpeed = 0.2;
         this.maxTurn = Math.PI / 20;
-        this.size = 5;
+        this.size = 5 / WIDTH;
         this.action = FINDFOOD;
         this.t = 0.0;
         this.senseRange = 2;

@@ -28,6 +28,7 @@ class Tools {
 
         HOME.selected = false;
         if (this.selectedAnt != null) {
+            this.selectedAnt.selected = false;
 
             var flingVelocity = this.position.add(this.lastPosition.mul(-1));
             console.log("fling " + flingVelocity + " " + flingVelocity.sqMagnitude());
@@ -40,12 +41,28 @@ class Tools {
             this.position = new Vec2(0.0, 0.0);
             this.lastPosition = new Vec2(0.0, 0.0);
 
-            this.selectedAnt.selected = false;
+
         }
         this.selectedAnt = null;
 
     }
     mouseDown(mouseX, mouseY) {
+
+        if (HOME.collide(mouseX, mouseY)) {
+            HOME.selected = true;
+            this.moveHome(mouseX, mouseY);
+        }
+        else if (this.selectedAnt == null) {
+            for (let i = 0; i < ants.length; i++) {
+                if (ants[i].collide(mouseX, mouseY)) {
+                    this.selectedAnt = ants[i];
+                    this.selectedAnt.selected = true;
+                    this.moveAnt(mouseX, mouseY);
+                    break;
+                }
+            }
+        }
+
         this.position = new Vec2(mouseX, mouseY);
         this.lastPosition = new Vec2(mouseX, mouseY);
 
@@ -53,24 +70,10 @@ class Tools {
     }
 
     handTool(mouseX, mouseY) {
-
+        console.log(this.selectedAnt);
         if (this.selectedAnt == null) {
             if (HOME.selected) {
                 this.moveHome(mouseX, mouseY);
-            }
-            else if (HOME.collide(mouseX, mouseY)) {
-                HOME.selected = true;
-                this.moveHome(mouseX, mouseY);
-            }
-            else if (this.selectedAnt == null) {
-                for (let i = 0; i < ants.length; i++) {
-                    if (ants[i].collide(mouseX, mouseY)) {
-                        this.selectedAnt = ants[i];
-                        this.selectedAnt.selected = true;
-                        this.moveAnt(mouseX, mouseY);
-                        break;
-                    }
-                }
             }
         }
         else {
