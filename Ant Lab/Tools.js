@@ -9,25 +9,57 @@ var brushDensity = 1;
 var brushDensitySlider = document.getElementById("brushDensity");
 
 brushDensitySlider.oninput = function () {
-    brushDensity = parseFloat(this.value) / 10 * parseFloat(this.value) / 10* parseFloat(this.value) / 10;
+    brushDensity = parseFloat(this.value) / 10 * parseFloat(this.value) / 10 * parseFloat(this.value) / 10;
 
 }
 
 class Tools {
     constructor() {
-
+        this.selectedAnt = null;
     }
+    selectedAnt;
 
+    mouseUp() {
+        HOME.selected = false;
+        if (this.selectedAnt != null) {
+            this.selectedAnt.selected = false;
+        }
+        this.selectedAnt = null;
+    }
 
     handTool(mouseX, mouseY) {
-        if (HOME.collide(mouseX, mouseY) || HOME.selected == true) {
-            HOME.x = mouseX;
-            HOME.y = mouseY;
-            HOME.selected = true;
+        if (HOME.selected == true) {
+            this.moveHome(mouseX, mouseY);
         }
-        console.log(HOME.selected);
+        else if (HOME.collide(mouseX, mouseY)) {
+            HOME.selected = true;
+            this.moveHome(mouseX, mouseY);
+        }
+
+        if (this.selectedAnt == null) {
+            for (let i = 0; i < ants.length; i++) {
+                if (ants[i].collide(mouseX, mouseY)) {
+                    this.selectedAnt = ants[i];
+                    this.selectedAnt.selected = true;
+                    this.moveAnt(mouseX, mouseY);
+                    break;
+                }
+            }
+        }
+        else {
+            this.moveAnt(mouseX, mouseY);
+        }
     }
 
+    moveHome(mouseX, mouseY) {
+        HOME.x = mouseX;
+        HOME.y = mouseY;
+    }
+
+    moveAnt(mouseX, mouseY) {
+        this.selectedAnt.x = mouseX;
+        this.selected.y = mouseY;
+    }
 
 
     drawFood(mouseX, mouseY) {
@@ -49,9 +81,9 @@ class Tools {
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
                 selectedCells[i].terrain = 1;
-                selectedCells[i].homingPh=0;
-                selectedCells[i].foodPh=0;
-                selectedCells[i].food=0;
+                selectedCells[i].homingPh = 0;
+                selectedCells[i].foodPh = 0;
+                selectedCells[i].food = 0;
             }
         }
     }

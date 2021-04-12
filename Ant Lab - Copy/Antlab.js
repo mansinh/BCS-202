@@ -4,13 +4,15 @@ const FOOD_TOOL = 3;
 const HAND_TOOL = 0;
 
 const ANT_COUNT = 100;
+const GRAVITY = 1 / 10;
+
 var activeAnts = 1;
 var activeAntsSlider = document.getElementById("activeAnts");
 activeAntsSlider.oninput = function () {
     activeAnts = this.value;
 }
 
-var foodEvaporation =0;
+var foodEvaporation = 0;
 var foodEvapSlider = document.getElementById("foodEvap");
 foodEvapSlider.oninput = function () {
     foodEvaporation = parseFloat(this.value);
@@ -80,18 +82,23 @@ class AntLab {
         this.tools.ANT_LAB = this;
         this.selectedTool = 0;
         CANVAS.addEventListener("mousedown", (e) => {
-
+            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
+            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
             this.usingTool = true;
+            this.tools.mouseDown(this.mousePosition.x, this.mousePosition.y);
             this.useTool(e);
         });
 
         CANVAS.addEventListener("mouseup", (e) => {
+            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
+            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
             this.usingTool = false;
-            HOME.selected = false;
+            this.tools.mouseUp(this.mousePosition.x, this.mousePosition.y);
         });
 
         CANVAS.addEventListener("mousemove", (e) => {
-
+            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
+            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
             this.useTool(e);
 
         });
@@ -110,8 +117,7 @@ class AntLab {
     }
 
     useTool(e) {
-        this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
-        this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
+
         //console.log("selected tool " + this.selectedTool + this.usingTool);
         if (this.usingTool) {
 
@@ -157,7 +163,7 @@ class AntLab {
     vertexDataBuffer;
 
     createVertices() {
-        
+
         for (let i = 0.0; i < cells.length; i++) {
             //positions
             this.vertices.push(cells[i].x);
@@ -177,7 +183,7 @@ class AntLab {
             //positions
             this.vertices.push(ants[i].x);
             this.vertices.push(ants[i].y);
-        
+
             this.vertices.push(1.0);
 
             //color
@@ -188,7 +194,7 @@ class AntLab {
         }
         this.vertices.push(0);
         this.vertices.push(0);
-    
+
         this.vertices.push(1.0);
 
         //color
@@ -199,7 +205,7 @@ class AntLab {
 
         this.vertices.push(HOME.x);
         this.vertices.push(HOME.y);
-    
+
         this.vertices.push(1.0);
 
         //color
@@ -208,7 +214,7 @@ class AntLab {
         this.vertices.push(0.5);
         this.vertices.push(1.0);
 
-       
+
 
 
         this.vertexDataBuffer = GL.createBuffer();
@@ -268,26 +274,43 @@ class AntLab {
         }
     }
 
+    update() {
+        var now = performance.now();
+        this.dt = (now - this.then) / 1000;
+        this.then = now;
+        if (!document.hasFocus()) {
+            this.isPlaying = false;
+            document.getElementById("playButton").innerHTML = "PLAY";
+        }
 
+        for (let i = 0; i < timeScale; i++) {
 
+            this.updateAnts();
 
+            this.updateCells();
+        }
 
+        this.updateHome();
+
+        this.draw();
+        document.getElementById("fps").innerHTML = "" + parseInt(1 / this.dt) + " FPS";
+        requestAnimationFrame(() => { this.update() });
+    }
 
     updateAnts() {
         let j = 0;
         for (let i = 0; i < activeAnts; i++) {
-            ants[i].update(this.dt);
+            ants[i].update(this.dt, this.isPlaying);
 
             this.updateAntVertices(i, j);
             j += STRIDE / FLOAT_SIZE_BYTES;
         }
-        
     }
     updateAntVertices(i, j) {
 
         var length = cells.length;
         this.vertices[j + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].x;
-        this.vertices[j + 1 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].y;
+        this.vertices[j + 1 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].y + ants[i].z;
         this.vertices[j + 3 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[j + 4 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
         this.vertices[j + 5 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color;
@@ -303,16 +326,16 @@ class AntLab {
         let j = 0;
         //console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-            cells[j].foodPh=Math.min(cells[j].foodPh,5);
-            cells[j].homingPh=Math.min(cells[j].homingPh,5);
+            cells[j].foodPh = Math.min(cells[j].foodPh, 5);
+            cells[j].homingPh = Math.min(cells[j].homingPh, 5);
             if (this.isPlaying) {
-                if(cells[j].homingPh>=0){
-                cells[j].homingPh -= homingEvaporation/100*this.dt ;
+                if (cells[j].homingPh >= 0) {
+                    cells[j].homingPh -= homingEvaporation / 100 * this.dt;
                 }
-                if(cells[j].foodPh>=0){
-                cells[j].foodPh -= foodEvaporation/100*this.dt;
+                if (cells[j].foodPh >= 0) {
+                    cells[j].foodPh -= foodEvaporation / 100 * this.dt;
                 }
-                
+
             }
             this.vertices[i + 3] = cells[j].terrain;
             this.vertices[i + 4] = cells[j].homingPh * 0.2;
@@ -323,20 +346,20 @@ class AntLab {
     }
 
     updateHome() {
-        var length = cells.length+ANT_COUNT;
+        var length = cells.length + ANT_COUNT;
         this.vertices[length * STRIDE / FLOAT_SIZE_BYTES] = HOME.x;
         this.vertices[1 + length * STRIDE / FLOAT_SIZE_BYTES] = HOME.y;
         this.vertices[3 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[4 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[5 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[6 + length * STRIDE / FLOAT_SIZE_BYTES] = 2;
-        
+
         //console.log("home pos " + this.vertices[homeIndex] + " " + this.vertices[homeIndex + 1]);
         if (this.isPlaying) {
 
         }
         else {
-            if(HOME.selected){
+            if (HOME.selected) {
                 let j = 0;
                 for (let i = 0.0; i < ants.length; i++) {
                     ants[i].x = HOME.x;
@@ -348,7 +371,7 @@ class AntLab {
         }
     }
 
-    
+
 
     setShaderProperties() {
         GL.useProgram(this.shader.program);
@@ -360,7 +383,7 @@ class AntLab {
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer)
         GL.vertexAttribPointer(this.shader.propertyLocationColor, 4, GL.FLOAT, false, STRIDE, VERTEX_COLOR_OFFSET);
 
-       
+
     }
 
 
@@ -384,41 +407,15 @@ class AntLab {
     dt;
     isPlaying;
 
-    update() {
-        var now = performance.now();
-        this.dt = (now - this.then)/1000;
-        this.then = now;
-        if (!document.hasFocus()) {
-            this.isPlaying = false;
-            document.getElementById("playButton").innerHTML = "PLAY";
-        }
-        
-        for(let i = 0; i < timeScale;i++){
-            if (this.isPlaying) {
-                this.updateAnts();
-            }
-            this.updateCells();
-        }
 
-        this.updateHome();
-
-        this.draw();
-        document.getElementById("fps").innerHTML = "" + parseInt(1 / this.dt) + " FPS";
-
-
-
-        requestAnimationFrame(() => { this.update() });
-
-
-    }
 
     draw() {
         GL.clear(GL.COLOR_BUFFER_BIT);
 
         GL.bufferSubData(GL.ARRAY_BUFFER, 0, new Float32Array(this.vertices));
-        GL.drawArrays(GL.POINTS, 0, ANT_COUNT + cells.length +1);
-   
-    
+        GL.drawArrays(GL.POINTS, 0, ANT_COUNT + cells.length + 1);
+
+
     }
 
 }

@@ -10,7 +10,7 @@ activeAntsSlider.oninput = function () {
     activeAnts = this.value;
 }
 
-var foodEvaporation =50;
+var foodEvaporation = 50;
 var foodEvapSlider = document.getElementById("foodEvap");
 foodEvapSlider.oninput = function () {
     foodEvaporation = parseFloat(this.value);
@@ -23,7 +23,7 @@ homingEvapSlider.oninput = function () {
 var timeScale = 0.5;
 var timeScaleSlider = document.getElementById("timeScale");
 timeScaleSlider.oninput = function () {
-    timeScale = parseFloat(this.value)/10;
+    timeScale = parseFloat(this.value) / 10;
 }
 
 const WIDTH = 200;
@@ -87,7 +87,8 @@ class AntLab {
 
         CANVAS.addEventListener("mouseup", (e) => {
             this.usingTool = false;
-            HOME.selected = false;
+            this.tools.mouseUp();
+
         });
 
         CANVAS.addEventListener("mousemove", (e) => {
@@ -146,8 +147,8 @@ class AntLab {
         for (let i = 0.0; i < WIDTH; i++) {
             for (let j = 0.0; j < HEIGHT; j++) {
                 let newCell = new Cell();
-                newCell.i=i;
-                newCell.j=j;
+                newCell.i = i;
+                newCell.j = j;
                 newCell.x = i / WIDTH * 2 - 1 + random() / WIDTH;
                 newCell.y = j / HEIGHT * 2 - 1 + random() / HEIGHT;
                 cells.push(newCell);
@@ -208,7 +209,7 @@ class AntLab {
     isPlaying = false;
     play() {
         this.isPlaying = !this.isPlaying;
-        
+
         if (this.isPlaying) {
             this.then = performance.now()
             document.getElementById("playButton").innerHTML = "PAUSE";
@@ -222,7 +223,7 @@ class AntLab {
         this.isPlaying = false;
         for (let i = 0.0; i < ants.length; i++) {
             ants[i].init();
-           
+
         }
         for (let i = 0.0; i < cells.length; i++) {
             cells[i].foodPh = 0;
@@ -268,28 +269,28 @@ class AntLab {
 
     update() {
         var now = performance.now();
-        this.dt = (now - this.then) * 0.001*timeScale;
+        this.dt = (now - this.then) * 0.001 * timeScale;
         this.then = now;
-        this.timeSinceUpdate+=this.dt;
-        
+        this.timeSinceUpdate += this.dt;
+
         if (!document.hasFocus()) {
             this.isPlaying = false;
             document.getElementById("playButton").innerHTML = "PLAY";
         }
 
 
-        if(this.timeSinceUpdate > 1.0/timeScale/60 || timeScale==1){
-            if (this.isPlaying) {
-                this.updateAnts();
-            }
+        if (this.timeSinceUpdate > 1.0 / timeScale / 60 || timeScale == 1) {
 
-        
+            this.updateAnts();
+
+
+
             this.updateCells();
             this.timeSinceUpdate = 0;
         }
         this.updateHome();
-       
-        
+
+
         this.draw();
 
         //console.log(this.dt)
@@ -310,7 +311,10 @@ class AntLab {
     updateAnts() {
         let j = 0;
         for (let i = 0; i < activeAnts; i++) {
-            ants[i].update();
+            ants[i].physics();
+            if (this.isPlaying) {
+                ants[i].update();
+            }
 
             this.updateAntVertices(i, j);
             j += STRIDE / FLOAT_SIZE_BYTES;
@@ -336,16 +340,16 @@ class AntLab {
         let j = 0;
         //console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-            cells[j].foodPh=Math.min(cells[j].foodPh,5);
-            cells[j].homingPh=Math.min(cells[j].homingPh,5);
+            cells[j].foodPh = Math.min(cells[j].foodPh, 5);
+            cells[j].homingPh = Math.min(cells[j].homingPh, 5);
             if (this.isPlaying) {
-                if(cells[j].homingPh>=0){
-                cells[j].homingPh -= homingEvaporation/10000;
+                if (cells[j].homingPh >= 0) {
+                    cells[j].homingPh -= homingEvaporation / 10000;
                 }
-                if(cells[j].foodPh>=0){
-                cells[j].foodPh -= foodEvaporation/10000;
+                if (cells[j].foodPh >= 0) {
+                    cells[j].foodPh -= foodEvaporation / 10000;
                 }
-                
+
             }
             this.vertices[i + 3] = cells[j].terrain;
             this.vertices[i + 4] = cells[j].homingPh * 0.5;
@@ -364,7 +368,7 @@ class AntLab {
 
         }
         else {
-            if(HOME.selected){
+            if (HOME.selected) {
                 let j = 0;
                 for (let i = 0.0; i < ants.length; i++) {
                     ants[i].x = HOME.x;
@@ -411,9 +415,9 @@ class AntLab {
     }
 
 
-   
 
-  
+
+
 
     draw() {
         GL.clear(GL.COLOR_BUFFER_BIT);
