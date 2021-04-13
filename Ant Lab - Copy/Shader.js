@@ -61,7 +61,7 @@ const FRAGMENT_SRC =
                      color = vec4(0.05,0.05,0.08,1.0);
                     }
                      else if(linkedColor.a >0.0){
-                        color = vec4(0.8,0.7,0.0,1.0);
+                        color = vec4(0.8*linkedColor.a,0.7*linkedColor.a,0.0,1.0);
                     }
                 
                     else if(linkedColor.g+linkedColor.b > 0.0){

@@ -132,13 +132,18 @@ function loadSettings() {
         document.getElementById("activeAnts").value = activeAnts;
         document.getElementById("activeAnts").nextElementSibling.value = activeAnts;
     }
+    if (localStorage.getItem("foodCapacity") != null) {
+        foodCapacity = localStorage.getItem("foodCapacity");
+        document.getElementById("foodCapacity").value = foodCapacity * 10;
+        document.getElementById("foodCapacity").nextElementSibling.value = foodCapacity;
+    }
     if (localStorage.getItem("foodEvap") != null) {
         foodEvaporation = localStorage.getItem("foodEvap");
         document.getElementById("foodEvap").value = foodEvaporation;
         document.getElementById("foodEvap").nextElementSibling.value = foodEvaporation;
     }
     if (localStorage.getItem("homingEvap") != null) {
-        foodEvaporation = localStorage.getItem("homingEvap");
+        homingEvaporation = localStorage.getItem("homingEvap");
         document.getElementById("homingEvap").value = homingEvaporation;
         document.getElementById("homingEvap").nextElementSibling.value = homingEvaporation;
     }

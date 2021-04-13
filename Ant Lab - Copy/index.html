@@ -57,6 +57,11 @@
                 <input type="range" min="1" max="100" value="1" id="activeAnts">
                 <output>1</output>
             </div>
+            <p>Food Carrying Capacity:</p>
+            <div class="slider">
+                <input type="range" min="0" max="10" value="0" id="foodCapacity">
+                <output>0</output>
+            </div>
 
             <p>Homing Ph Evaporation:</p>
             <div class="slider">
@@ -85,7 +90,7 @@
 
         <div class="control">
             <p id="fps">fps</p>
-            <button id="playButton" onclick="play()">Play</button>
+            <button id="playButton" onclick="play()">Start</button>
             <button onclick="stop()">Stop</button>
         </div>
 

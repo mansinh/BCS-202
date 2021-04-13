@@ -8,6 +8,9 @@ const SQUISH_TOOL = 4;
 const ANT_COUNT = 100;
 const GRAVITY = 1 / 10;
 
+var maxExplorationDistance = 5;
+var maxTurn = Math.PI / 20;
+
 var activeAnts = 1;
 var activeAntsSlider = document.getElementById("activeAnts");
 activeAntsSlider.oninput = function () {
@@ -15,16 +18,24 @@ activeAntsSlider.oninput = function () {
     this.nextElementSibling.value = this.value;
     localStorage.setItem("activeAnts", "" + activeAnts);
 }
+var foodCapacity = 0;
+var foodCapacitySlider = document.getElementById("foodCapacity");
+foodCapacitySlider.oninput = function () {
+    foodCapacity = parseFloat(this.value) / 10;
+    this.nextElementSibling.value = foodCapacity;
+    localStorage.setItem("foodCapacity", "" + foodCapacity);
+}
 
-var foodEvaporation = 0;
+var foodEvaporation = 50;
 var foodEvapSlider = document.getElementById("foodEvap");
 foodEvapSlider.oninput = function () {
     foodEvaporation = parseFloat(this.value);
     this.nextElementSibling.value = this.value;
     localStorage.setItem("foodEvap", "" + foodEvaporation);
 }
-var homingEvaporation = 0;
+var homingEvaporation = 25;
 var homingEvapSlider = document.getElementById("homingEvap");
+
 homingEvapSlider.oninput = function () {
     homingEvaporation = parseFloat(this.value);
     this.nextElementSibling.value = this.value;
@@ -55,6 +66,8 @@ class AntLab {
 
         this.then = 0.0;
         this.dt = 1 / 30;
+
+
         this.isPlaying = false;
 
         this.usingTool = false;
@@ -242,19 +255,30 @@ class AntLab {
 
     }
 
+    started = false;
     isPlaying = false;
     play() {
+        this.started = true;
         this.isPlaying = !this.isPlaying;
         if (this.isPlaying) {
             this.then = performance.now()
+            HOME.init();
             document.getElementById("playButton").innerHTML = "Pause";
+
         }
         else {
-            document.getElementById("playButton").innerHTML = "Play";
+            if (this.started) {
+                document.getElementById("playButton").innerHTML = "Resume";
+            }
+            else {
+
+                document.getElementById("playButton").innerHTML = "Start";
+            }
         }
     }
 
     stop() {
+        this.started = false;
         this.isPlaying = false;
         for (let i = 0.0; i < ants.length; i++) {
             ants[i].init();
@@ -263,7 +287,7 @@ class AntLab {
             cells[i].foodPh = 0;
             cells[i].homingPh = 0;
         }
-        document.getElementById("playButton").innerHTML = "Play";
+        document.getElementById("playButton").innerHTML = "Start";
         let j = 0;
         for (let i = 0; i < ants.length; i++) {
             this.updateAntVertices(i, j);
@@ -300,9 +324,14 @@ class AntLab {
 
         if (!document.hasFocus()) {
             this.isPlaying = false;
-            document.getElementById("playButton").innerHTML = "Play";
+            if (this.started) {
+                document.getElementById("playButton").innerHTML = "Resume";
+            }
+            else {
+                document.getElementById("playButton").innerHTML = "Start";
+            }
         }
-
+        this.updateHome();
         for (let i = 0; i < timeScale; i++) {
 
             this.updateAnts();
@@ -310,7 +339,7 @@ class AntLab {
             this.updateCells();
         }
 
-        this.updateHome();
+
 
         this.draw();
         document.getElementById("fps").innerHTML = "" + parseInt(1 / deltaTime) + " FPS";
@@ -349,20 +378,25 @@ class AntLab {
         let j = 0;
         //console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-            cells[j].foodPh = Math.min(cells[j].foodPh, 10);
-            cells[j].homingPh = Math.min(cells[j].homingPh, 10);
+            //cells[j].foodPh = Math.min(cells[j].foodPh, 10);
+            //cells[j].homingPh = Math.min(cells[j].homingPh, 10);
             if (this.isPlaying) {
-                if (cells[j].homingPh >= 0) {
-                    cells[j].homingPh -= homingEvaporation / 300 * this.dt;
+                if (cells[j].homingPh > 0) {
+                    cells[j].homingPh -= homingEvaporation / 5000 * this.dt;
+                }
+                else {
+                    cells[j].homingPh = 0;
                 }
                 if (cells[j].foodPh >= 0) {
-                    cells[j].foodPh -= foodEvaporation / 300 * this.dt;
+                    cells[j].foodPh -= foodEvaporation / 5000 * this.dt;
                 }
-
+                else {
+                    cells[j].foodPh = 0;
+                }
             }
             this.vertices[i + 3] = cells[j].obstacle;
-            this.vertices[i + 4] = cells[j].homingPh * 0.1;
-            this.vertices[i + 5] = cells[j].foodPh * 0.1;
+            this.vertices[i + 4] = cells[j].homingPh;
+            this.vertices[i + 5] = cells[j].foodPh;
             this.vertices[i + 6] = cells[j].food;
             j++;
         }
@@ -379,7 +413,7 @@ class AntLab {
 
         //console.log("home pos " + this.vertices[homeIndex] + " " + this.vertices[homeIndex + 1]);
         if (this.isPlaying) {
-
+            HOME.update(this.dt);
         }
         else {
             if (HOME.selected) {
@@ -390,6 +424,8 @@ class AntLab {
                     this.updateAntVertices(i, j)
                     j += STRIDE / FLOAT_SIZE_BYTES;
                 }
+
+
             }
         }
     }
@@ -442,3 +478,4 @@ class AntLab {
     }
 
 }
+

@@ -1,6 +1,6 @@
 const FINDFOOD = 0;
 const RETURNFOOD = 1;
-
+const RETURNHOME = 2;
 
 class Ant {
     constructor() {
@@ -12,11 +12,12 @@ class Ant {
         this.vz = 0;
         this.direction = new Vec2(0.0, 0.0);
         this.maxSpeed = 0.1;
-        this.maxTurn = Math.PI / 20;
+        this.maxTurn = Math.PI / 30;
+        this.distanceTravelled = 0;
         this.size = 10 / width;
         this.action = FINDFOOD;
         this.t = 0.0;
-        this.senseRange = 2;
+        this.senseRange = 4;
         this.selected = false;
         this.color = new Color();
         this.squished = false;
@@ -32,13 +33,15 @@ class Ant {
         this.vz = 0;
         var angle = random() * Math.PI * 2;
         this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
+        this.distanceTravelled = 0;
         this.action = FINDFOOD;
         this.color.toWhite();
-        this.timeActive = 0;
+
     }
-    x; y; z;
+    x; y; z; i; j;
     vx; vy; vz;
     direction; maxSpeed; maxTurn; size; senseRange;
+    distanceTravelled;
     action; //0=findFood, 1=foodFound1, 2 = ...,
     selected;
     color;
@@ -53,58 +56,132 @@ class Ant {
                     this.init();
                     this.squished = false;
                 }
-
             }
             else if (this.vx == 0 && this.vy == 0 && this.vz == 0) {
-
                 if (isPlaying) {
                     this.behaviour(dt)
                 }
             }
             else {
-                this.vz += -GRAVITY * dt;
-                this.z += this.vz;
-                if (this.z <= 0) {
-                    this.vz = -this.vz * 0.6;
-                    this.vy = this.vy * 0.9;
-                    this.vx = this.vx * 0.9;
-                    this.z = 0;
-                }
-                if (this.x < -1) {
-                    this.x = -1;
-                    this.vx = -this.vx;
-                }
-                if (this.x > 1) {
-                    this.x = 1;
-                    this.vx = -this.vx;
-                }
-                if (this.y < -1) {
-                    this.y = -1;
-                    this.vy = -this.vy;
-                }
-                if (this.y > 1) {
-                    this.y = 1;
-                    this.vy = -this.vy;
-                }
-                if (Math.abs(this.vz) < 0.001) {
-                    this.vz = 0;
-
-                }
-                if (Math.abs(this.vy) < 0.001) {
-                    this.vy = 0;
-                }
-                if (Math.abs(this.vx) < 0.001) {
-                    this.vx = 0;
-                }
-
-                this.x += this.vx * dt;
-                this.y += this.vy * dt;
+                this.physics(dt);
             }
         }
     }
 
     behaviour(dt) {
         this.t += dt;
+        this.worldBoundBehaviour();
+        this.i = Math.min(Math.round((this.x + 1.0) * width / 2), width - 1);
+        this.j = Math.min(Math.round((this.y + 1.0) * height / 2), height - 1);
+        var sample = this.getCells(this.i, this.j, this.senseRange);
+        var phDirection = this.sensePheromone(sample);
+        if (this.obstacleBehaviour()) {
+
+        }
+        else if (this.action == FINDFOOD) {
+            this.findFoodBehaviour(phDirection, sample);
+        }
+        else if (this.action == RETURNFOOD || this.action == RETURNHOME) {
+            this.homingBehaviour(phDirection, sample);
+        }
+
+        this.move(dt);
+        this.pheromoneBehaviour(this.i, this.j);
+        if (this.distanceTravelled > maxExplorationDistance) {
+            this.init();
+        }
+    }
+
+    sensePheromone(sample) {
+        var phDirection = new Vec2(0.0, 0.0);
+        var maxPh = 0;
+        for (let k = 0; k < sample.length; k++) {
+            if (k != parseInt(sample.length / 2)) {
+                var cell = sample[k];
+                var ph = cell.foodPh;
+                if (this.action == RETURNFOOD) {
+                    ph = cell.homingPh;
+                }
+
+                if (ph > maxPh && Math.random() < 0.9) {
+
+                    var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
+                    if (cellDirection.dot(this.direction) > 0) {
+                        phDirection = cellDirection;
+                        maxPh = ph;
+
+                    }
+                }
+            }
+        }
+        return phDirection;
+    }
+
+    findFoodBehaviour(foodPhDirection, sample) {
+
+        var foodCells = [];
+        for (let k = 0; k < sample.length; k++) {
+            if (sample[k].food > 0) {
+                foodCells.push(sample[k]);
+            }
+        }
+        var foodFound = this.getCell(this.i, this.j).food;
+        if (foodFound > 0) {
+            this.action = RETURNFOOD;
+            this.distanceTravelled = 0;
+            this.direction = this.direction.mul(-1);
+
+            this.getCell(this.i, this.j).food = Math.max(foodFound - foodCapacity, 0);
+            console.log(this.getCell(this.i, this.j).food);
+        }
+        else if (foodCells.length > 0) {
+            var randomFoodCell = foodCells[parseInt(foodCells.length * Math.random())];
+            this.direction = new Vec2(randomFoodCell.x - this.x, randomFoodCell.y - this.y).normal();
+        }
+        else if (foodPhDirection.sqMagnitude() > 0) {
+            //console.log(foodPhDirection);
+            this.direction = foodPhDirection;
+
+        }
+        else {
+            this.randomTurn()
+        }
+
+    }
+
+    homingBehaviour(homingPhDirection, sample) {
+
+        if (homingPhDirection.sqMagnitude() > 0) {
+            //console.log(homingPhDirection);
+            this.direction = homingPhDirection;
+        }
+        if (HOME.collide(this.x, this.y)) {
+            this.action = FINDFOOD;
+            var angle = random() * Math.PI * 2;
+            //this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
+            this.direction = this.direction.mul(-1);
+            this.distanceTravelled = 0;
+
+        }
+    }
+
+    obstacleBehaviour() {
+        var sample = this.getCells(this.i, this.j, 1);
+        for (let k = 0; k < sample.length; k++) {
+            var cell = sample[k];
+            if (cell.obstacle > 0) {
+                var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
+                if (cellDirection.dot(this.direction) > 0.2) {
+                    var cross = Math.sign(this.direction.x * cellDirection.y - this.direction.y * cellDirection.x);
+                    this.direction = cellDirection.perp(cross);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    worldBoundBehaviour() {
         if (this.x > 1.0) {
             this.direction.x = - this.direction.x;
             this.x = 1.0;
@@ -121,91 +198,101 @@ class Ant {
             this.direction.y = - this.direction.y;
             this.y = -1.0;
         }
-        var i = Math.min(parseInt((this.x + 1.0) * width / 2), width - 1);
-        var j = Math.min(parseInt((this.y + 1.0) * height / 2), height - 1);
-        var neighbours = this.getCells(i, j, this.senseRange);
-        //console.log(neighbours.length);
-        var foodCells = [];
-        for (let k = 0; k < neighbours.length; k++) {
-            if (neighbours[k].food > 0) {
-                foodCells.push(neighbours[k]);
+    }
+
+    pheromoneBehaviour(i, j) {
+        if (j + i * height < cells.length && j + i * height > 0) {
+            var phStrength = Math.exp(this.distanceTravelled * Math.log(0.1) / maxExplorationDistance);
+            //console.log(phStrength);
+            switch (this.action) {
+                case 0:
+                    this.layHomingPh(i, j, phStrength);
+                    break;
+                case 1:
+                    this.layFoodPh(i, j, phStrength);
+                    break;
             }
         }
+    }
 
-        if (this.action == FINDFOOD) {
-            if (this.getCell(i, j).food > 0) {
-                this.action = RETURNFOOD;
-                //this.direction = this.direction.mul(-1);
-            }
-            else if (foodCells.length > 0) {
-                var randomFoodCell = foodCells[parseInt(foodCells.length * Math.random())];
-                this.direction = new Vec2(randomFoodCell.x - this.x, randomFoodCell.y - this.y).normal();
-            }
+    layHomingPh(i, j, phStrength) {
+        var cell = cells[j + i * height];
+        cell.homingPh = Math.max(cell.homingPh, phStrength);
+        //cell.homingPhDirection = cell.homingPhDirection.add(this.direction.mul(-1));
 
-        }
-        if (this.action == RETURNFOOD) {
-            var homingPhDirection = new Vec2(0.0, 0.0);
-            for (let k = 0; k < neighbours.length; k++) {
-                var cell = neighbours[k];
-                if (cell.homingPh > 0) {
-                    var neighbourDirection = new Vec2(cell.x - this.x, cell.y - this.y);
-                    //if(neighbourDirection.dot(this.direction)>=0){
-                    //if(cell.homingPhDirection.dot(this.dirVector)>=0){
-                    homingPhDirection = homingPhDirection.add(cell.homingPhDirection.mul(cell.homingPh));
-                    //}
-                    //}
-                }
-            }
-            if (homingPhDirection.sqMagnitude() > 0) {
-                //console.log(homingPhDirection);
-                this.direction = homingPhDirection.normal();
-            }
-            if (HOME.collide(this.x, this.y)) {
-                this.action = FINDFOOD;
-                var angle = random() * Math.PI * 2;
-                this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
-            }
-        }
+    }
+    layFoodPh(i, j, phStrength) {
+        var cell = cells[j + i * height];
+        cell.foodPh = Math.max(cell.foodPh, phStrength);
+        //cell.foodPhDirection = cell.foodPhDirection.add(this.direction.mul(-1));
 
-        var angle = this.maxTurn * random();
-        this.direction.x = this.direction.x * Math.cos(angle) + this.direction.y * Math.sin(angle);
-        this.direction.y = -this.direction.x * Math.sin(angle) + this.direction.y * Math.cos(angle);
+    }
+
+
+
+    move(dt) {
+
         this.direction = this.direction.normal();
-        this.x += this.direction.x * this.maxSpeed * dt;
-        this.y += this.direction.y * this.maxSpeed * dt;
+        var dvx = this.direction.x * this.maxSpeed * dt;
+        var dvy = this.direction.y * this.maxSpeed * dt
+        this.x += dvx;
+        this.y += dvy;
+
+        this.distanceTravelled += Math.sqrt(dvx * dvx + dvy * dvy)
 
         //this.z = (Math.sin(this.timeActive * 60 + this.index / ANT_COUNT * Math.PI) + 1) / 4 / height;
         this.z = 2 * Math.random() / 300;
+    }
 
+    randomTurn() {
+        var angle = this.maxTurn * random();
+        this.direction.x = this.direction.x * Math.cos(angle) + this.direction.y * Math.sin(angle);
+        this.direction.y = -this.direction.x * Math.sin(angle) + this.direction.y * Math.cos(angle);
+    }
 
-        if (j + i * height < cells.length && j + i * height > 0) {
-            switch (this.action) {
-                case 0:
-                    this.layHomingPh(i, j);
-                    break;
-                case 1:
-                    this.layFoodPh(i, j);
-                    break;
-            }
+    physics(dt) {
+        this.vz += -GRAVITY * dt;
+        this.z += this.vz;
+        if (this.z <= 0) {
+            this.vz = -this.vz * 0.6;
+            this.vy = this.vy * 0.9;
+            this.vx = this.vx * 0.9;
+            this.z = 0;
+        }
+        if (this.x < -1) {
+            this.x = -1;
+            this.vx = -this.vx;
+        }
+        if (this.x > 1) {
+            this.x = 1;
+            this.vx = -this.vx;
+        }
+        if (this.y < -1) {
+            this.y = -1;
+            this.vy = -this.vy;
+        }
+        if (this.y > 1) {
+            this.y = 1;
+            this.vy = -this.vy;
+        }
+        if (Math.abs(this.vz) < 0.001) {
+            this.vz = 0;
 
         }
-    }
+        if (Math.abs(this.vy) < 0.001) {
+            this.vy = 0;
+        }
+        if (Math.abs(this.vx) < 0.001) {
+            this.vx = 0;
+        }
 
-    layHomingPh(i, j) {
-        var cell = cells[j + i * height];
-        cell.homingPh += 1;
-        cell.homingPhDirection = cell.homingPhDirection.add(this.direction.mul(-1));
-
-    }
-    layFoodPh(i, j) {
-        var cell = cells[j + i * height];
-        cell.foodPh += 1;
-        cell.foodPhDirection = cell.foodPhDirection.add(this.direction.mul(-1));
-
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
     }
 
     getCells(x, y, size) {
         var selectedCells = [];
+
         for (let i = -size; i <= size; i++) {
             for (let j = -size; j <= size; j++) {
 

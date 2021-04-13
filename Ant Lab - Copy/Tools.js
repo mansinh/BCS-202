@@ -51,7 +51,7 @@ class Tools {
     }
     mouseDown(mouseX, mouseY) {
         if (ANT_LAB.selectedTool == PICKUP_TOOL) {
-            if (HOME.collide(mouseX, mouseY)) {
+            if (HOME.collide(mouseX, mouseY) && !ANT_LAB.started) {
                 HOME.selected = true;
                 this.moveHome(mouseX, mouseY);
             }
@@ -139,8 +139,8 @@ class Tools {
     }
 
     erase(mouseX, mouseY) {
-        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
-        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
+        var x = Math.min(Math.round((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(Math.round((mouseY + 1.0) * height / 2), height - 1);
         var selectedCells = this.getCells(x, y);
         for (let i = 0; i < selectedCells.length; i++) {
             if (Math.random() < brushDensity) {
