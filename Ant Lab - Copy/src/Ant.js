@@ -1,6 +1,6 @@
 const FINDFOOD = 0;
 const RETURNFOOD = 1;
-const RETURNHOME = 2;
+
 
 class Ant {
     constructor() {
@@ -17,7 +17,7 @@ class Ant {
         this.size = 10 / width;
         this.action = FINDFOOD;
         this.t = 0.0;
-        this.senseRange = 4;
+        this.senseRange = 3;
         this.selected = false;
         this.color = new Color();
         this.squished = false;
@@ -42,7 +42,7 @@ class Ant {
     vx; vy; vz;
     direction; maxSpeed; maxTurn; size; senseRange;
     distanceTravelled;
-    action; //0=findFood, 1=foodFound1, 2 = ...,
+    action;
     selected;
     color;
     timeActive; index;
@@ -82,7 +82,7 @@ class Ant {
         else if (this.action == FINDFOOD) {
             this.findFoodBehaviour(phDirection, sample);
         }
-        else if (this.action == RETURNFOOD || this.action == RETURNHOME) {
+        else if (this.action == RETURNFOOD) {
             this.homingBehaviour(phDirection, sample);
         }
 
@@ -103,14 +103,11 @@ class Ant {
                 if (this.action == RETURNFOOD) {
                     ph = cell.homingPh;
                 }
-
                 if (ph > maxPh && Math.random() < 0.9) {
-
                     var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
                     if (cellDirection.dot(this.direction) > 0) {
                         phDirection = cellDirection;
                         maxPh = ph;
-
                     }
                 }
             }
@@ -119,7 +116,6 @@ class Ant {
     }
 
     findFoodBehaviour(foodPhDirection, sample) {
-
         var foodCells = [];
         for (let k = 0; k < sample.length; k++) {
             if (sample[k].food > 0) {
@@ -136,7 +132,7 @@ class Ant {
 
         }
         else if (foodCells.length > 0) {
-            var randomFoodCell = foodCells[parseInt(foodCells.length * Math.random())];
+            var randomFoodCell = foodCells[parseInt(foodCells.length * (Math.random() * 0.99))];
             this.direction = new Vec2(randomFoodCell.x - this.x, randomFoodCell.y - this.y).normal();
         }
         else if (foodPhDirection.sqMagnitude() > 0) {
@@ -175,11 +171,12 @@ class Ant {
             var cell = sample[k];
             if (cell.obstacle > 0) {
                 var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
-                if (cellDirection.dot(this.direction) > 0.2) {
+                if (cellDirection.dot(this.direction) > 0.5) {
                     var cross = Math.sign(this.direction.x * cellDirection.y - this.direction.y * cellDirection.x);
                     tangent = tangent.add(cellDirection.perp(cross));
                     normal = normal.add(cellDirection);
                     collided = true;
+
                 }
             }
         }

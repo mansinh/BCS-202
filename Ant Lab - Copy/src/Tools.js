@@ -168,7 +168,7 @@ class Tools {
         var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
         var selectedCells = this.getCells(x, y);
         for (let i = 0; i < selectedCells.length; i++) {
-            if (Math.random() < brushDensity) {
+            if (Math.random() < brushDensity && selectedCells[i].obstacle == 0) {
                 selectedCells[i].foodPh = 1;
             }
         }
