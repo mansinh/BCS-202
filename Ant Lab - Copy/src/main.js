@@ -1,7 +1,14 @@
 const CANVAS = document.getElementById("canvas");
 const GL = CANVAS.getContext("webgl2");
-CANVAS.width = window.innerWidth - 200;
-CANVAS.height = window.innerHeight;
+var isPortrait = false;
+
+
+setCanvasSize();
+
+window.addEventListener("resize", function () {
+    setCanvasSize();
+
+});
 const ASPECT_RATIO_WIDTH_MULTIPLIER = CANVAS.clientWidth / CANVAS.clientHeight;
 const ANT_LAB = new AntLab();
 
@@ -11,11 +18,29 @@ ANT_LAB.init();
 onPickupTool();
 
 var toolsPanel = document.getElementById("tools");
+
 var settingsPanel = document.getElementById("settings");
 var toolsTab = document.getElementById("toolsTab")
 var settingsTab = document.getElementById("settingsTab")
 showTools();
 
+function setCanvasSize() {
+    console.log('Resize')
+    if (window.innerWidth < window.innerHeight) {
+        CANVAS.width = window.innerWidth;
+        CANVAS.height = window.innerHeight - 200;
+        isPortrait = true;
+        console.log('portrait')
+    }
+    else {
+        CANVAS.width = window.innerWidth - 200;
+        CANVAS.height = window.innerHeight;
+        isPortrait = false;
+        console.log('landscape')
+
+    }
+
+}
 function play() {
     ANT_LAB.play();
 }

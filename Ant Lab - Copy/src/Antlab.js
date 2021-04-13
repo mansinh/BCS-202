@@ -118,24 +118,24 @@ class AntLab {
         this.tools = new Tools();
         this.tools.ANT_LAB = this;
         this.selectedTool = 0;
+
+
         CANVAS.addEventListener("mousedown", (e) => {
-            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
-            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
+            this.getMousePosition(e);
+
             this.usingTool = true;
             this.tools.mouseDown(this.mousePosition.x, this.mousePosition.y);
             this.useTool(e);
         });
 
         CANVAS.addEventListener("mouseup", (e) => {
-            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
-            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
+            this.getMousePosition(e);
             this.usingTool = false;
             this.tools.mouseUp(this.mousePosition.x, this.mousePosition.y);
         });
 
         CANVAS.addEventListener("mousemove", (e) => {
-            this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
-            this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
+            this.getMousePosition(e);
             this.useTool(e);
 
         });
@@ -154,7 +154,15 @@ class AntLab {
         this.update();
     }
 
+    getMousePosition(e) {
 
+
+        this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
+        this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
+
+
+
+    }
 
     useTool(e) {
 

@@ -1,21 +1,48 @@
 body{
     margin:0px;
     width:100%;
-    overflow: hidden;
+    overflow:hidden;
     
+}
+
+@media (pointer:none), (pointer:coarse) {
+  .pallet{
+    margin:0px;
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width: 100vh;
+    height: 100vh;
+    
+    position: absolute;
+    top: 100%;
+    left: 0;
+  }
 }
 
 .pallet{
     width:200px;
     position: absolute;
     right: 0px;
-    height:100%;
+   
     background-color: rgb(40, 40, 40);
     vertical-align: middle;
     
     font-size: 14px;
-   
+    height:100%;
+    overflow-y: auto;
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+    
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgb(20, 20, 20);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(60, 60, 60);
+  }
 
 .tab{
     width: 49%;
@@ -63,8 +90,11 @@ p{
 }
 
 
+
+
 .slider input{
     width: 80%;
+    color: rgb(20, 20, 20);
 }
 
 .numberInput{
@@ -90,6 +120,7 @@ input[type="number"], textarea{
 
 }
 .canvasHolder{
+   
     left:0px;
     position: absolute;
     top: 0px;
@@ -97,8 +128,8 @@ input[type="number"], textarea{
 
 .control{
     width: 100%;
-    position:absolute;
-    bottom:20px;
+   
+   
 }
 
 button{
