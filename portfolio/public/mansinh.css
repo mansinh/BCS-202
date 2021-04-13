@@ -47,7 +47,7 @@ html{
 
 .header
 {
-    height:40px;
+    height:60px;
     width: 100%;
     top: 0;
     left: 0;
@@ -78,6 +78,7 @@ a{
     padding-right: 40px;
     color: #215D66;
     transition: 0.2s;
+    margin: 5px;
 }
 
 a:hover{
@@ -131,7 +132,7 @@ a:hover{
 
     .header
     {
-        height:60px;
+        height:0px;
         width: 100%;
         top: 0;
         left: 0;
@@ -239,12 +240,11 @@ a{
     height: 30px;
     max-width: 90%;
     
-    
     text-decoration: none;
     display: inline-block;
     font-size: 18px;
     font-weight: bold;
-    
+   
     padding-top:10px;
     padding-left:10px;
     padding-right:10px;
@@ -255,8 +255,6 @@ a{
     background-color: #FFFFFF;
     color:#215D66;
     box-shadow: 0px 3px 10px rgba(0,0,0,0.1)
-
-    
 
     bottom:0;
     }

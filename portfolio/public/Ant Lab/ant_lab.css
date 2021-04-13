@@ -1,65 +1,21 @@
 body{
     margin:0px;
     width:100%;
-    overflow:hidden;
-    background-color: black;
-}
-
-@media (pointer:none), (pointer:coarse) {
-  .pallet{
-    margin:0px;
-    transform: rotate(-90deg);
-    transform-origin: left top;
-    width:200px;
-    height: 100vh;
+    overflow: hidden;
     
-    position: absolute;
-    top: 0;
-    left: 0;
-    overflow-y: auto;
-  }
 }
-@media (orientation: portrait) {
-    .pallet{
-      margin:0px;
-      transform: rotate(-90deg);
-      transform-origin: left top;
-      width:200px;
-      height: 100vh;
-      
-      position: absolute;
-      top: 200px;
-      left: 0;
-      overflow-y: auto;
-    }
-  }
-
 
 .pallet{
     width:200px;
     position: absolute;
     right: 0px;
-   
-    background-color: rgba(0, 0, 0,0.5);
-  
+    height:100%;
+    background-color: rgb(40, 40, 40);
     vertical-align: middle;
     
     font-size: 14px;
-    height:100%;
-    overflow-y: auto;
+   
 }
-
-::-webkit-scrollbar {
-    width: 10px;
-    
-  }
-
-  ::-webkit-scrollbar-track {
-    background: rgba(20, 20, 20,0.5);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: rgba(60, 60, 60,0.5);
-  }
 
 .tab{
     width: 49%;
@@ -68,7 +24,7 @@ body{
     text-decoration: none;
     text-align: center;
     font-family: Arial, Helvetica, sans-serif;
-    background-color: rgba(0, 0, 0,0.5);
+    background-color: rgb(40, 40, 40);
     display: inline-block;
     color: rgb(190, 190, 190);
     border-top-left-radius: 5px;
@@ -79,7 +35,7 @@ body{
 }
 
 .tabs{
-    background-color: rgba(0, 0, 0,0.5);
+    background-color: rgb(20, 20, 20);
     height: 30px;
 
 }
@@ -89,7 +45,7 @@ p{
     text-decoration: none;
     font-family: Arial, Helvetica, sans-serif;
     color: rgb(189, 189, 189);
-    background-color: rgba(0, 0, 0,0);
+    background-color: rgb(40, 40, 40);
     height:20px;
     line-height:20px;
     vertical-align: middle;
@@ -103,15 +59,12 @@ p{
     padding-left:15px;
     text-decoration: none;
     font-family: Arial, Helvetica, sans-serif;
-   
+    color: rgb(190, 190, 190);
 }
-
-
 
 
 .slider input{
     width: 80%;
-    color: rgb(20, 20, 20);
 }
 
 .numberInput{
@@ -137,7 +90,6 @@ input[type="number"], textarea{
 
 }
 .canvasHolder{
-   
     left:0px;
     position: absolute;
     top: 0px;
@@ -145,8 +97,8 @@ input[type="number"], textarea{
 
 .control{
     width: 100%;
-   
-   
+    position:absolute;
+    bottom:20px;
 }
 
 button{
@@ -156,7 +108,7 @@ button{
     width: 38%;
     padding: 5px;
     color: rgb(190, 190, 190);
-    background-color: rgba(40, 40, 40,1);
+    background-color: rgb(20, 20, 20);
     border-radius: 5px;
     border-style: solid;
     border:none;

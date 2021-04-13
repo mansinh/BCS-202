@@ -27,6 +27,8 @@ function headerVisible(){
 	}
 }
 
+document.body.addEventListener('click', closeEnlarged, true);
+
 
 var enlarged = $("#enlarged");
 var enlargedImg = $("#enlarged_img");

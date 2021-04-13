@@ -29,7 +29,7 @@
         </div>
 
 
-        <div id="tools" class="tools">
+        <div id="tools">
             <p>Brush Size:</p>
             <div class="slider">
                 <input type="range" min="1" max="10" value="10" name="brushSize" id="brushSize">
@@ -54,7 +54,7 @@
 
             <button onclick="clearPh()">Clear Ph</button>
         </div>
-        <div id="settings" class="settings">
+        <div id="settings">
 
             <p>Ant Number:</p>
             <div class="slider">
@@ -84,8 +84,8 @@
             </div>
             <p>Simulation Size:</p>
             <div class="numberInput">
-                <input type="number" min="1" max="500" value="150" id="simWidth">
-                <input type="number" min="1" max="500" value="150" id="simHeight">
+                <input type="number" min="1" max="500" value="200" id="simWidth">
+                <input type="number" min="1" max="500" value="200" id="simHeight">
             </div>
             <button id="applySizeButton" onclick="applySize()">Apply</button>
 
@@ -106,7 +106,12 @@
 
 
     </div>
-    
+    <script src=" ./src/tools.js"></script>
+    <script src=" ./src/antlab.js"></script>
+    <script src=" ./src/ant.js"></script>
+    <script src=" ./src/cell.js"></script>
+    <script src=" ./src/home.js"></script>
+    <script src=" ./src/shader.js"></script>
 
     <script src=" ./src/main.js"></script>
 </body>
