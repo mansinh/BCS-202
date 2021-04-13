@@ -44,17 +44,26 @@
             <p id="pickupTool" onclick="onPickupTool()">Pick Up</p>
             <p id="squishTool" onclick="onSquishTool()">Squish</p>
             <p id="eraseTool" onclick="onEraseTool()">Erase</p>
-            <p id="foodTool" onclick="onFoodTool()">Food</p>
-            <p id="obstacleTool" onclick="onObstacleTool()">Obstacle</p>
+            <p id="foodTool" onclick="onFoodTool()">Draw Food</p>
+            <p id="obstacleTool" onclick="onObstacleTool()">Draw Obstacle</p>
+            <p id="foodPhTool" onclick="onFoodPhTool()">Draw Food Ph</p>
+            <p id="homingPhTool" onclick="onHomingPhTool()">Draw Homing Ph</p>
 
             <button onclick="clearCells()">Clear</button>
             <button onclick="fillCells()">Fill</button>
+
+            <button onclick="clearPh()">Clear Ph</button>
         </div>
         <div id="settings">
 
             <p>Ant Number:</p>
             <div class="slider">
                 <input type="range" min="1" max="100" value="1" id="activeAnts">
+                <output>1</output>
+            </div>
+            <p>Ant Lifespan:</p>
+            <div class="slider">
+                <input type="range" min="0" max="10" value="1" id="lifeSpan">
                 <output>1</output>
             </div>
             <p>Food Carrying Capacity:</p>
@@ -90,20 +99,21 @@
 
         <div class="control">
             <p id="fps">fps</p>
+            <p id="foodCollected">Food Collected: 0</p>
             <button id="playButton" onclick="play()">Start</button>
             <button onclick="stop()">Stop</button>
         </div>
 
 
     </div>
-    <script src=" ./tools.js"></script>
-    <script src=" ./antlab.js"></script>
-    <script src=" ./ant.js"></script>
-    <script src=" ./cell.js"></script>
-    <script src=" ./home.js"></script>
-    <script src=" ./shader.js"></script>
+    <script src=" ./src/tools.js"></script>
+    <script src=" ./src/antlab.js"></script>
+    <script src=" ./src/ant.js"></script>
+    <script src=" ./src/cell.js"></script>
+    <script src=" ./src/home.js"></script>
+    <script src=" ./src/shader.js"></script>
 
-    <script src=" ./main.js"></script>
+    <script src=" ./src/main.js"></script>
 </body>
 
 </html>

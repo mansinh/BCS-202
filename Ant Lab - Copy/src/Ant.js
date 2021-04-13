@@ -75,6 +75,7 @@ class Ant {
         this.j = Math.min(Math.round((this.y + 1.0) * height / 2), height - 1);
         var sample = this.getCells(this.i, this.j, this.senseRange);
         var phDirection = this.sensePheromone(sample);
+
         if (this.obstacleBehaviour()) {
 
         }
@@ -87,7 +88,7 @@ class Ant {
 
         this.move(dt);
         this.pheromoneBehaviour(this.i, this.j);
-        if (this.distanceTravelled > maxExplorationDistance) {
+        if (this.distanceTravelled > lifeSpan) {
             this.init();
         }
     }
@@ -130,9 +131,9 @@ class Ant {
             this.action = RETURNFOOD;
             this.distanceTravelled = 0;
             this.direction = this.direction.mul(-1);
-
+            foodCollected += Math.min(foodFound, foodCapacity);
             this.getCell(this.i, this.j).food = Math.max(foodFound - foodCapacity, 0);
-            console.log(this.getCell(this.i, this.j).food);
+
         }
         else if (foodCells.length > 0) {
             var randomFoodCell = foodCells[parseInt(foodCells.length * Math.random())];
@@ -167,16 +168,28 @@ class Ant {
 
     obstacleBehaviour() {
         var sample = this.getCells(this.i, this.j, 1);
+        var normal = new Vec2(0.0, 0.0);
+        var tangent = new Vec2(0.0, 0.0);
+        var collided = false;
         for (let k = 0; k < sample.length; k++) {
             var cell = sample[k];
             if (cell.obstacle > 0) {
                 var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
                 if (cellDirection.dot(this.direction) > 0.2) {
                     var cross = Math.sign(this.direction.x * cellDirection.y - this.direction.y * cellDirection.x);
-                    this.direction = cellDirection.perp(cross);
-                    return true;
+                    tangent = tangent.add(cellDirection.perp(cross));
+                    normal = normal.add(cellDirection);
+                    collided = true;
                 }
             }
+        }
+
+        if (collided) {
+            this.direction = tangent.normal();
+            tangent = tangent.normal();
+            this.x -= normal.x / width;
+            this.y -= normal.y / height;
+            return true;
         }
         return false;
     }
@@ -202,7 +215,7 @@ class Ant {
 
     pheromoneBehaviour(i, j) {
         if (j + i * height < cells.length && j + i * height > 0) {
-            var phStrength = Math.exp(this.distanceTravelled * Math.log(0.1) / maxExplorationDistance);
+            var phStrength = Math.exp(this.distanceTravelled * Math.log(0.1) / lifeSpan);
             //console.log(phStrength);
             switch (this.action) {
                 case 0:

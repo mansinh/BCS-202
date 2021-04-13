@@ -152,6 +152,27 @@ class Tools {
         }
     }
 
+    drawHomingPh(mouseX, mouseY) {
+        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
+        var selectedCells = this.getCells(x, y);
+        for (let i = 0; i < selectedCells.length; i++) {
+            if (Math.random() < brushDensity) {
+                selectedCells[i].homingPh = 1;
+            }
+        }
+    }
+
+    drawFoodPh(mouseX, mouseY) {
+        var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
+        var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
+        var selectedCells = this.getCells(x, y);
+        for (let i = 0; i < selectedCells.length; i++) {
+            if (Math.random() < brushDensity) {
+                selectedCells[i].foodPh = 1;
+            }
+        }
+    }
 
 
     getCells(x, y) {

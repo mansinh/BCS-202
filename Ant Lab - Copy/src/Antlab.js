@@ -4,11 +4,12 @@ const ERASE_TOOL = 2;
 const FOOD_TOOL = 3;
 const PICKUP_TOOL = 0;
 const SQUISH_TOOL = 4;
+const HOMINGPH_TOOL = 5;
+const FOODPH_TOOL = 6;
 
 const ANT_COUNT = 100;
 const GRAVITY = 1 / 10;
 
-var maxExplorationDistance = 5;
 var maxTurn = Math.PI / 20;
 
 var activeAnts = 1;
@@ -18,6 +19,15 @@ activeAntsSlider.oninput = function () {
     this.nextElementSibling.value = this.value;
     localStorage.setItem("activeAnts", "" + activeAnts);
 }
+
+var lifeSpan = 1;
+var lifeSpanSlider = document.getElementById("lifeSpan");
+lifeSpanSlider.oninput = function () {
+    lifeSpan = this.value;
+    this.nextElementSibling.value = this.value;
+    localStorage.setItem("lifeSpan", "" + lifeSpan);
+}
+
 var foodCapacity = 0;
 var foodCapacitySlider = document.getElementById("foodCapacity");
 foodCapacitySlider.oninput = function () {
@@ -33,6 +43,7 @@ foodEvapSlider.oninput = function () {
     this.nextElementSibling.value = this.value;
     localStorage.setItem("foodEvap", "" + foodEvaporation);
 }
+
 var homingEvaporation = 25;
 var homingEvapSlider = document.getElementById("homingEvap");
 
@@ -41,6 +52,7 @@ homingEvapSlider.oninput = function () {
     this.nextElementSibling.value = this.value;
     localStorage.setItem("homingEvap", "" + homingEvaporation);
 }
+
 var timeScale = 1.0;
 var timeScaleSlider = document.getElementById("timeScale");
 timeScaleSlider.oninput = function () {
@@ -48,6 +60,8 @@ timeScaleSlider.oninput = function () {
     this.nextElementSibling.value = this.value;
     localStorage.setItem("timeScale", "" + timeScale);
 }
+
+var foodCollected = 0;
 
 var width = 300;
 var height = 300;
@@ -163,6 +177,12 @@ class AntLab {
                 case ERASE_TOOL:
                     this.tools.erase(this.mousePosition.x, this.mousePosition.y);
                     break;
+                case HOMINGPH_TOOL:
+                    this.tools.drawHomingPh(this.mousePosition.x, this.mousePosition.y);
+                    break;
+                case FOODPH_TOOL:
+                    this.tools.drawFoodPh(this.mousePosition.x, this.mousePosition.y);
+                    break;
             }
         }
     }
@@ -258,16 +278,21 @@ class AntLab {
     started = false;
     isPlaying = false;
     play() {
+        if (!this.started) {
+            foodCollected = 0;
+        }
         this.started = true;
         this.isPlaying = !this.isPlaying;
         if (this.isPlaying) {
             this.then = performance.now()
             HOME.init();
+
             document.getElementById("playButton").innerHTML = "Pause";
 
         }
         else {
             if (this.started) {
+
                 document.getElementById("playButton").innerHTML = "Resume";
             }
             else {
@@ -302,6 +327,13 @@ class AntLab {
         for (let i = 0.0; i < cells.length; i++) {
             cells[i].obstacle = 0;
             cells[i].food = 0;
+
+        }
+    }
+    clearPh() {
+        console.log("CLEAR PH");
+        for (let i = 0.0; i < cells.length; i++) {
+
             cells[i].foodPh = 0;
             cells[i].homingPh = 0;
         }
@@ -343,7 +375,7 @@ class AntLab {
 
         this.draw();
         document.getElementById("fps").innerHTML = "" + parseInt(1 / deltaTime) + " FPS";
-
+        document.getElementById("foodCollected").innerHTML = "Food Collected: " + parseFloat(Math.round(foodCollected * 10)) / 10;
         if (!this.changedSize) {
             requestAnimationFrame(() => { this.update() });
         }

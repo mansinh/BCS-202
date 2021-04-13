@@ -31,6 +31,9 @@ function clearCells() {
 function fillCells() {
     ANT_LAB.fillCells();
 }
+function clearPh() {
+    ANT_LAB.clearPh();
+}
 
 function applySize() {
     width = parseInt(document.getElementById("simWidth").value);
@@ -51,6 +54,8 @@ function clearTools() {
     this.clearTool("obstacleTool");
     this.clearTool("eraseTool");
     this.clearTool("foodTool");
+    this.clearTool("homingPhTool");
+    this.clearTool("foodPhTool");
 }
 
 function onPickupTool() {
@@ -86,6 +91,20 @@ function onEraseTool() {
     ANT_LAB.selectedTool = ERASE_TOOL;
     document.getElementById("eraseTool").style.backgroundColor = "grey";
     document.getElementById("eraseTool").style.color = "white";
+}
+
+function onHomingPhTool() {
+    this.clearTools();
+    ANT_LAB.selectedTool = HOMINGPH_TOOL;
+    document.getElementById("homingPhTool").style.backgroundColor = "grey";
+    document.getElementById("homingPhTool").style.color = "white";
+}
+
+function onFoodPhTool() {
+    this.clearTools();
+    ANT_LAB.selectedTool = FOODPH_TOOL;
+    document.getElementById("foodPhTool").style.backgroundColor = "grey";
+    document.getElementById("foodPhTool").style.color = "white";
 }
 
 
@@ -131,6 +150,11 @@ function loadSettings() {
         activeAnts = localStorage.getItem("activeAnts");
         document.getElementById("activeAnts").value = activeAnts;
         document.getElementById("activeAnts").nextElementSibling.value = activeAnts;
+    }
+    if (localStorage.getItem("lifeSpan") != null) {
+        lifeSpan = localStorage.getItem("lifeSpan");
+        document.getElementById("lifeSpan").value = lifeSpan;
+        document.getElementById("lifeSpan").nextElementSibling.value = lifeSpan;
     }
     if (localStorage.getItem("foodCapacity") != null) {
         foodCapacity = localStorage.getItem("foodCapacity");
