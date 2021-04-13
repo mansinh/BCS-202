@@ -32,7 +32,7 @@
         <div id="tools">
             <p>Brush Size:</p>
             <div class="slider">
-                <input type="range" min="1" max="10" value="5" name="brushSize" id="brushSize">
+                <input type="range" min="1" max="10" value="10" name="brushSize" id="brushSize">
                 <output>5</output>
             </div>
             <p>Brush Density:</p>
@@ -58,23 +58,23 @@
 
             <p>Ant Number:</p>
             <div class="slider">
-                <input type="range" min="1" max="100" value="1" id="activeAnts">
+                <input type="range" min="1" max="50" value="1" id="activeAnts">
                 <output>1</output>
             </div>
             <p>Ant Lifespan:</p>
             <div class="slider">
-                <input type="range" min="0" max="20" value="1" id="lifeSpan">
+                <input type="range" min="0" max="20" value="10" id="lifeSpan">
                 <output>1</output>
             </div>
             <p>Food Carrying Capacity:</p>
             <div class="slider">
-                <input type="range" min="0" max="10" value="0" id="foodCapacity">
+                <input type="range" min="0" max="10" value="1" id="foodCapacity">
                 <output>0</output>
             </div>
 
             <p>Homing Ph Evaporation:</p>
             <div class="slider">
-                <input type="range" min="0" max="100" value="25" id="homingEvap">
+                <input type="range" min="0" max="100" value="50" id="homingEvap">
                 <output>25</output>
             </div>
             <p>Food Ph Evaporation:</p>
@@ -84,14 +84,14 @@
             </div>
             <p>Simulation Size:</p>
             <div class="numberInput">
-                <input type="number" min="1" max="1000" value="300" id="simWidth">
-                <input type="number" min="1" max="1000" value="300" id="simHeight">
+                <input type="number" min="1" max="500" value="200" id="simWidth">
+                <input type="number" min="1" max="500" value="200" id="simHeight">
             </div>
             <button id="applySizeButton" onclick="applySize()">Apply</button>
 
             <p>Simulation Speed:</p>
             <div class="slider">
-                <input type="range" min="1" max="10" value="1" id="timeScale">
+                <input type="range" min="1" max="10" value="5" id="timeScale">
                 <output>1</output>
             </div>
             <br>
