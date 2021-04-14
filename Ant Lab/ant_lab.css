@@ -1,0 +1,173 @@
+body{
+    margin:0px;
+    width:100%;
+    overflow:hidden;
+    background-color: black;
+}
+
+@media (pointer:none), (pointer:coarse) {
+  .pallet{
+    margin:0px;
+    transform: rotate(-90deg);
+    transform-origin: left top;
+    width:200px;
+    height: 100vh;
+    
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow-y: auto;
+  }
+}
+
+@media (orientation: portrait) {
+    .pallet{
+      margin:0px;
+      transform: rotate(-90deg);
+      transform-origin: left top;
+      width:200px;
+      height: 100vh;
+      
+      position: absolute;
+      top: 200px;
+      left: 0;
+      overflow-y: auto;
+    }
+  }
+
+
+.pallet{
+    width:200px;
+    position: absolute;
+    right: 0px;
+   
+    background-color: rgba(0, 0, 0,0.5);
+  
+    vertical-align: middle;
+    
+    font-size: 14px;
+    height:100%;
+    overflow-y: auto;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+    
+  }
+
+  ::-webkit-scrollbar-track {
+    background: rgba(20, 20, 20,0.5);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(60, 60, 60,0.5);
+  }
+
+.tab{
+    width: 49%;
+    height: 100%;
+    margin:0px;
+    text-decoration: none;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgba(0, 0, 0,0.5);
+    display: inline-block;
+    color: rgb(190, 190, 190);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    line-height:30px;
+
+
+}
+
+.tabs{
+    background-color: rgba(0, 0, 0,0.5);
+    height: 30px;
+
+}
+
+p{
+    padding-left:15px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    color: rgb(189, 189, 189);
+    background-color: rgba(0, 0, 0,0);
+    height:20px;
+    line-height:20px;
+    vertical-align: middle;
+    margin-top: 8x;
+    margin-bottom: 8px;
+}
+
+
+
+.slider{
+    padding-left:15px;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+   
+}
+
+
+
+
+.slider input{
+    width: 80%;
+    color: rgb(180, 180, 180);
+}
+
+output{
+  color: rgb(180, 180, 180);
+
+}
+
+.numberInput{
+    margin-left: 15px;
+    margin-bottom: 10px;
+}
+
+input[type="number"], textarea{
+    color: rgb(190, 190, 190);
+    background-color: rgb(20, 20, 20);
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    border:none;
+    padding:5px;
+    
+}
+
+.canvas{
+   
+    position: absolute;
+    top: 0px;
+
+}
+.canvasHolder{
+   
+    left:0px;
+    position: absolute;
+    top: 0px;
+}
+
+.control{
+    width: 100%;
+   
+   
+}
+
+button{
+    margin-bottom: 5px;
+    margin-top: 5px;
+    margin-left: 15px;
+    width: 38%;
+    padding: 5px;
+    color: rgb(190, 190, 190);
+    background-color: rgba(40, 40, 40,1);
+    border-radius: 5px;
+    border-style: solid;
+    border:none;
+    text-decoration: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+
+}

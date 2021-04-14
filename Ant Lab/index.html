@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="ant_lab.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ant Pheromone Sim</title>
+    
+    <style></style>
+</head>
+
+<body>
+
+
+
+
+
+    <div class="canvasHolder">
+        <canvas id="canvas" class="canvas"></canvas>
+    </div>
+
+
+
+    <div class="pallet">
+        <div class="tabs">
+            <p1 class="tab" id="toolsTab" onclick="showTools()">Tools</p1>
+            <p1 class="tab" id="settingsTab" onclick="showSettings()">Settings</p1>
+        </div>
+
+
+        <div id="tools" class="tools">
+            <p>Brush Size:</p>
+            <div class="slider">
+                <input type="range" min="1" max="10" value="10" name="brushSize" id="brushSize">
+                <output>5</output>
+            </div>
+            <p>Brush Density:</p>
+            <div class="slider">
+                <input type="range" min="1" max="10" value="10" name="brushDensity" id="brushDensity">
+                <output>1</output>
+            </div>
+
+            <p id="pickupTool" onclick="onPickupTool()">Pick Up</p>
+            <p id="squishTool" onclick="onSquishTool()">Squish</p>
+            <p id="eraseTool" onclick="onEraseTool()">Erase</p>
+            <p id="foodTool" onclick="onFoodTool()">Draw Food</p>
+            <p id="obstacleTool" onclick="onObstacleTool()">Draw Obstacle</p>
+            <p id="foodPhTool" onclick="onFoodPhTool()">Draw Food Ph</p>
+            <p id="homingPhTool" onclick="onHomingPhTool()">Draw Homing Ph</p>
+
+            <button onclick="clearCells()">Clear</button>
+            <button onclick="fillCells()">Fill</button>
+
+            <button onclick="clearPh()">Clear Ph</button>
+        </div>
+        <div id="settings" class="settings">
+
+            <p>Ant Number:</p>
+            <div class="slider">
+                <input type="range" min="1" max="100" value="1" id="activeAnts">
+                <output>1</output>
+            </div>
+            <p>Ant Lifespan:</p>
+            <div class="slider">
+                <input type="range" min="0" max="20" value="5" id="lifeSpan">
+                <output>5</output>
+            </div>
+            <p>Food Carrying Capacity:</p>
+            <div class="slider">
+                <input type="range" min="0" max="10" value="0" id="foodCapacity">
+                <output>0</output>
+            </div>
+
+            <p>Homing Ph Evaporation:</p>
+            <div class="slider">
+                <input type="range" min="0" max="100" value="10" id="homingEvap">
+                <output>10</output>
+            </div>
+            <p>Food Ph Evaporation:</p>
+            <div class="slider">
+                <input type="range" min="0" max="100" value="20" id="foodEvap">
+                <output>20</output>
+            </div>
+            <p>Simulation Size:</p>
+            <div class="numberInput">
+                <input type="number" min="1" max="500" value="150" id="simWidth">
+                <input type="number" min="1" max="500" value="100" id="simHeight">
+            </div>
+            <button id="applySizeButton" onclick="applySize()">Apply</button>
+
+            <p>Simulation Speed:</p>
+            <div class="slider">
+                <input type="range" min="1" max="10" value="5" id="timeScale">
+                <output>5</output>
+            </div>
+            <br>
+        </div>
+
+        <div class="control">
+            <p id="fps">fps</p>
+            <p id="foodCollected">Food Collected: 0</p>
+            <button id="playButton" onclick="play()">Start</button>
+            <button onclick="stop()">Stop</button>
+        </div>
+
+
+    </div>
+    <script src=" ./ant.js"></script>
+    <script src=" ./cell.js"></script>
+    <script src=" ./home.js"></script>
+    <script src=" ./shader.js"></script>
+    <script src=" ./tools.js"></script>
+    <script src=" ./antlab.js"></script>
+    <script src=" ./sounds.js"></script>
+    <script src=" ./main.js"></script>
+</body>
+
+</html>
