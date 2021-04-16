@@ -18,18 +18,21 @@ class Home {
         this.time = 0;
     }
 
+    // Ant collision to check if an ant has returned home
     collide(x, y) {
         var dx = x - this.x;
         var dy = y - this.y;
-        //console.log("home sdfsdf" + dx + " " + dy + " " + (this.size * this.size > dx * dx + dy * dy));
         return this.size * this.size > dx * dx + dy * dy;
     }
+
+    // Tool collsiion to check if home has been picked up
     toolCollide(x, y) {
         var dx = x - this.x;
         var dy = y - this.y;
         //console.log("home sdfsdf" + dx + " " + dy + " " + (this.size * this.size > dx * dx + dy * dy));
         return this.size * this.size/zoom*2 > dx * dx + dy * dy;
     }
+    // Lay homing pheromone at home every 3 seconds
     time;
     update(dt) {
         var i = Math.min(parseInt((this.x + 1.0) * width / 2), width - 1);

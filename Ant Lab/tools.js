@@ -1,3 +1,4 @@
+// Brush settings
 var brushSize = 5;
 var brushSizeSlider = document.getElementById("brushSize");
 
@@ -16,6 +17,7 @@ brushDensitySlider.oninput = function () {
     localStorage.setItem("brushDensity", "" + this.value);
 }
 
+
 class Tools {
     constructor() {
         this.selectedAnt = null;
@@ -26,7 +28,7 @@ class Tools {
     selectedAnt;
     lastPosition; position;
 
-
+    // On pointer up, fling/drop ant if holding an ant. Drop home if holding
     mouseUp(mouseX, mouseY) {
 
         HOME.selected = false;
@@ -43,18 +45,19 @@ class Tools {
             }
             this.position = new Vec2(0.0, 0.0);
             this.lastPosition = new Vec2(0.0, 0.0);
-
-
         }
         this.selectedAnt = null;
-
     }
+
+    
     mouseDown(mouseX, mouseY) {
         if (ANT_LAB.selectedTool == PICKUP_TOOL) {
+            // Pick up home if pointer over home and the sumulation has not started
             if (HOME.toolCollide(mouseX, mouseY) && !ANT_LAB.started) {
                 HOME.selected = true;
                 this.moveHome(mouseX, mouseY);
             }
+            // Pick up ant if pointer over ant if the simulation has started
             else if (this.selectedAnt == null && ANT_LAB.started) {
                 for (let i = 0; i < ants.length; i++) {
                     if (ants[i].toolCollide(mouseX, mouseY)) {
@@ -69,12 +72,9 @@ class Tools {
 
         this.position = new Vec2(mouseX, mouseY);
         this.lastPosition = new Vec2(mouseX, mouseY);
-
-
     }
 
     pickupTool(mouseX, mouseY) {
-        //console.log(this.selectedAnt);
         if (this.selectedAnt == null  ) {
             if (HOME.selected) {
                 this.moveHome(mouseX, mouseY);
@@ -91,25 +91,28 @@ class Tools {
 
 
     moveHome(mouseX, mouseY) {
-        if(CANVAS.width > CANVAS.height){
+        // move home to pointer if in screen orientation is landscape 
+        if(!isPortrait){
             HOME.x = mouseX;
             HOME.y = mouseY;
             
         }
+        // if screen orientation is portrait, assume mobile device and move home to just above finger
         else{
             HOME.x = mouseX - 20/width/zoom;
             HOME.y = mouseY;
-        }
-        
+        }   
     }
 
     moveAnt(mouseX, mouseY) {
+        // move ant to pointer and ant velocity to zero
         this.selectedAnt.x = mouseX;
         this.selectedAnt.y = mouseY;
         this.selectedAnt.vz = 0;
         this.selectedAnt.vy = 0;
         this.selectedAnt.vx = 0;
-        if(CANVAS.width > CANVAS.height){
+        // if portrait, assume mobile device set ant height such that the ant is just above finger
+        if(!isPortrait){
             this.selectedAnt.z = 20 / height/zoom;
         }
         else{
@@ -117,6 +120,7 @@ class Tools {
         }
     }
 
+    // Stop an ant and return ant to home
     squishTool(mouseX, mouseY) {
         for (let i = 0; i < ants.length; i++) {
             var squishRadius = brushSize / width * 2;
@@ -126,6 +130,7 @@ class Tools {
         }
     }
 
+    // Draw food onto the map
     drawFood(mouseX, mouseY) {
         var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
         var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
@@ -137,6 +142,7 @@ class Tools {
         }
     }
 
+    // Draw obstacles onto the map
     drawObstacle(mouseX, mouseY) {
 
         var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
@@ -152,6 +158,7 @@ class Tools {
         }
     }
 
+    // Erase obstacles, food and pheromone from the map
     erase(mouseX, mouseY) {
         var x = Math.min(Math.round((mouseX + 1.0) * width / 2), width - 1);
         var y = Math.min(Math.round((mouseY + 1.0) * height / 2), height - 1);
@@ -166,6 +173,7 @@ class Tools {
         }
     }
 
+    // Draw homing pheromone onto the map
     drawHomingPh(mouseX, mouseY) {
         var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
         var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
@@ -177,6 +185,7 @@ class Tools {
         }
     }
 
+    // Draw food pheromone onto the map
     drawFoodPh(mouseX, mouseY) {
         var x = Math.min(parseInt((mouseX + 1.0) * width / 2), width - 1);
         var y = Math.min(parseInt((mouseY + 1.0) * height / 2), height - 1);
@@ -188,7 +197,7 @@ class Tools {
         }
     }
 
-
+    // Get map cells under brush
     getCells(x, y) {
         var selectedCells = [];
         for (let i = -brushSize; i <= brushSize; i++) {
@@ -208,6 +217,4 @@ class Tools {
         }
         return new Cell();
     }
-
-
 }

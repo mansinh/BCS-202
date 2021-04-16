@@ -90,6 +90,7 @@ class Shader {
     propertyLocationColor;
     propertyLocationPointSize;
 
+    // Store references to attributes in shader
     getPropertyLocations() {
         this.propertyLocationPosition = GL.getAttribLocation(this.program, "position");
         this.propertyLocationColor = GL.getAttribLocation(this.program, "color");
@@ -100,7 +101,7 @@ class Shader {
     }
 
 
-
+    // Create and attach vertex and fragment shader to new shader program
     createShaders() {
         var vertexShader = this.getAndCompileShader(VERTEX_SRC, GL.VERTEX_SHADER);
         var fragmentShader = this.getAndCompileShader(FRAGMENT_SRC, GL.FRAGMENT_SHADER);
@@ -113,6 +114,7 @@ class Shader {
         return newShaderProgram;
     }
 
+    // Convert string to shader 
     getAndCompileShader(source, shaderType) {
         var shaderText = source.trim();
         var newShader = GL.createShader(shaderType);

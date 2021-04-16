@@ -1,6 +1,7 @@
 class Sounds{
     squishSounds;
     constructor(){
+        // Sound pool
         this.squishSounds = [];
         this.squishSounds.push(new Sound("515619__mrickey13__splat-squish-2.wav"));
         this.squishSounds.push(new Sound("515619__mrickey13__splat-squish-2.wav"));
@@ -10,9 +11,10 @@ class Sounds{
         this.squishSounds.push(new Sound("515619__mrickey13__splat-squish-2.wav"));
     }
     
-
+    
     playSquishSound(){
         for(let i = 0; i < this.squishSounds.length;i++){
+            // Play if not playing
             if(this.squishSounds[i].isPaused()){
                 this.squishSounds[i].play();
                 console.log("play "+i);

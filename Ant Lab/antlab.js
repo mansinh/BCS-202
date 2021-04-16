@@ -1,3 +1,4 @@
+// Tool types
 const OBSTACLE_TOOL = 1;
 const ERASE_TOOL = 2;
 const FOOD_TOOL = 3;
@@ -6,12 +7,17 @@ const SQUISH_TOOL = 4;
 const HOMINGPH_TOOL = 5;
 const FOODPH_TOOL = 6;
 
+/*******************************************************************************************************************/
+// Simulation parameters
 const ANT_COUNT = 100;
 const GRAVITY = 1 / 10;
 
 var maxTurn = Math.PI / 20;
-
 var activeAnts = 1;
+var foodCollected = 0;
+var width = 150;
+var height = 100;
+// Get simulation parameters from UI
 var activeAntsSlider = document.getElementById("activeAnts");
 activeAntsSlider.oninput = function () {
     activeAnts = this.value;
@@ -61,15 +67,9 @@ timeScaleSlider.oninput = function () {
 }
 
 
-
-var foodCollected = 0;
-
-var width = 150;
-var height = 100;
-
+/*******************************************************************************************************************/
 var ants = [];
 var cells = [];
-
 var HOME;
 
 class AntLab {
@@ -78,16 +78,14 @@ class AntLab {
         HOME = new Home();
 
         this.totalTime = 0.0;
-
         this.then = 0.0;
         this.dt = 1 / 30;
 
 
         this.isPlaying = false;
-
         this.usingTool = false;
 
-
+        // Resize canvas when window resized
         window.addEventListener('resize', function (event) {
             CANVAS.width = window.innerWidth;
             CANVAS.height = window.innerHeight;
@@ -98,30 +96,20 @@ class AntLab {
 
     }
 
-    shader;
-    tools;
-    usingTool;
     CANVAS = document.getElementById("canvas");
-
-    selectedTool;
-
-    mousePosition = {
-        x: -2,
-        y: -2
-    };
-
-
-
+    shader;
+    
+    // Initialize application
     init() {
-
-
-        this.shader = new Shader();
+        
+        // Init tools
         this.tools = new Tools();
         this.tools.ANT_LAB = this;
         this.selectedTool = 0;
 
 
-        
+        // User input detection
+        // mouse
         CANVAS.addEventListener("mousedown", (e) => {
             this.getMousePosition(e);
             this.usingTool = true;
@@ -141,7 +129,7 @@ class AntLab {
 
         });
 
-
+        // touch screen 
         CANVAS.addEventListener("touchstart", (e) =>{
             e.preventDefault();
             this.getTouchPosition(e)
@@ -163,21 +151,28 @@ class AntLab {
             this.useTool(e);
         },false);
 
-
-
-
-        GL.viewport(0, 0, CANVAS.clientWidth, CANVAS.clientHeight);
-        GL.clearColor(0, 0, 0, 1);
-
+        // Create objects
         this.createAnts();
         this.createCells();
         this.createVertices();
+
+        // Init drawing
+        this.shader = new Shader();
+        GL.viewport(0, 0, CANVAS.clientWidth, CANVAS.clientHeight);
+        GL.clearColor(0, 0, 0, 1);
         this.setShaderProperties();
         this.changedSize = false;
-        console.log(width + " " + height);
+        
         this.update();
     }
 
+    /*******************************************************************************************************************/
+    // User pointer input and tools
+
+    mousePosition = {
+        x: -2,
+        y: -2
+    };
     getMousePosition(e) {
         this.mousePosition.x = this.remapValue(e.clientX, 0, CANVAS.clientWidth, -1, 1);
         this.mousePosition.y = -this.remapValue(e.clientY, 0, CANVAS.clientHeight, -1, 1);
@@ -189,8 +184,15 @@ class AntLab {
             this.mousePosition.y = -this.remapValue(e.changedTouches[0].pageY, 0, CANVAS.clientHeight, -1, 1);
         }
     }
-  
 
+    remapValue(v, minSrc, maxSrc, minDst, maxDst) {
+        return (v - minSrc) / (maxSrc - minSrc) * (maxDst - minDst) + minDst;
+    }
+  
+    tools;
+    usingTool;
+    selectedTool;
+    
     useTool(e) {
 
         //console.log("selected tool " + this.selectedTool + this.usingTool);
@@ -222,6 +224,8 @@ class AntLab {
         }
     }
 
+    /*******************************************************************************************************************/
+    // Create objects/vertices
     createAnts() {
 
         for (let i = 0; i < ANT_COUNT * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
@@ -231,7 +235,6 @@ class AntLab {
             ants.push(newAnt);
         }
     }
-
 
     createCells() {
         this.cells = [];
@@ -251,6 +254,8 @@ class AntLab {
     createVertices() {
         this.vertices = [];
 
+
+        // Cell vertices
         for (let i = 0.0; i < cells.length; i++) {
             //positions
             this.vertices.push(cells[i].x);
@@ -265,7 +270,7 @@ class AntLab {
             //console.log(cells[i].x + " " + cells[i].y);
         }
 
-
+        // Ant vertices
         for (let i = 0; i < ANT_COUNT; i++) {
             //positions
             this.vertices.push(ants[i].x);
@@ -279,6 +284,8 @@ class AntLab {
             this.vertices.push(1);
             this.vertices.push(1.0);
         }
+
+        // Home vertices
         this.vertices.push(0);
         this.vertices.push(0);
 
@@ -301,15 +308,17 @@ class AntLab {
         this.vertices.push(0.5);
         this.vertices.push(1.0);
 
-
-
-
+        // Create and bind vertex buffers
         this.vertexDataBuffer = GL.createBuffer();
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer)
         GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(this.vertices), GL.DYNAMIC_DRAW);
 
     }
 
+    /*******************************************************************************************************************/
+    // Buttons
+    // On play button pressed, start simulation if it has not been started, pause simulation if it is playing and
+    // resume simulation if it is paused
     started = false;
     isPlaying = false;
     play() {
@@ -321,9 +330,7 @@ class AntLab {
         if (this.isPlaying) {
             this.then = performance.now()
             HOME.init();
-
             document.getElementById("playButton").innerHTML = "Pause";
-
         }
         else {
             if (this.started) {
@@ -337,6 +344,7 @@ class AntLab {
         }
     }
 
+    // On stop buton pressed, stop the simulation and reset the ants and pheromones
     stop() {
         this.started = false;
         this.isPlaying = false;
@@ -356,7 +364,7 @@ class AntLab {
 
     }
 
-
+    // On clear cells button pressed, remove all obstacles and food from map cells
     clearCells() {
         console.log("CLEAR");
         for (let i = 0.0; i < cells.length; i++) {
@@ -365,6 +373,8 @@ class AntLab {
 
         }
     }
+
+     // On clear ph button pressed, remove all pheromones from map cells
     clearPh() {
         console.log("CLEAR PH");
         for (let i = 0.0; i < cells.length; i++) {
@@ -374,6 +384,7 @@ class AntLab {
         }
     }
 
+    // On fill cells button pressed, fill the entire map with obstacles
     fillCells() {
         console.log("FILL");
         for (let i = 0.0; i < cells.length; i++) {
@@ -384,11 +395,23 @@ class AntLab {
         }
     }
 
+    /*******************************************************************************************************************/
+    // Updating simulation
+
+    frameCount;
+    totalTime;
+    then;
+    dt;
+    isPlaying;
+
+    // Update the simulation every frame per browser refresh rate
     update() {
+        // Calculate time between frames
         var now = performance.now();
         var deltaTime = (now - this.then) / 1000;
         this.then = now;
 
+        // Pause application if window or tab has changed
         if (!document.hasFocus()) {
             this.isPlaying = false;
             if (this.started) {
@@ -398,20 +421,21 @@ class AntLab {
                 document.getElementById("playButton").innerHTML = "Start";
             }
         }
+
+        
         this.updateHome();
-        
-
-            this.updateAnts();
-            for (let i = 0; i < timeScale; i++) {
-                this.updateCells();
-            }
-        
-
-
-
+        this.updateAnts();
+        // Update cells at simulation speed (timeScale)
+        for (let i = 0; i < timeScale; i++) {
+            this.updateCells();
+        }
         this.draw();
+
+        // Display FPS and food collected 
         document.getElementById("fps").innerHTML = "" + parseInt(1 / deltaTime) + " FPS";
         document.getElementById("foodCollected").innerHTML = "Food Collected: " + parseFloat(Math.round(foodCollected * 10)) / 10;
+        
+        // Continue with simulation if the map sized has not been changed
         if (!this.changedSize) {
             requestAnimationFrame(() => { this.update() });
         }
@@ -419,19 +443,21 @@ class AntLab {
 
     updateAnts() {
         let j = 0;
-        
         for (let i = 0; i < activeAnts; i++) {
-            
+            // If the simulation is playing, update ants at simulation speed 
             if(this.isPlaying){
                 for (let k = 0; k < timeScale; k++) {
                     ants[i].update(this.dt);
                 }
             }
+            // Apply physics to ants
             ants[i].physicsUpdate(this.dt);
+        
             this.updateAntVertices(i, j);
             j += STRIDE / FLOAT_SIZE_BYTES;
         }
     }
+
     updateAntVertices(i, j) {
 
         var length = cells.length;
@@ -447,20 +473,15 @@ class AntLab {
         this.vertices[j + 4 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color.g;
         this.vertices[j + 5 + length * STRIDE / FLOAT_SIZE_BYTES] = ants[i].color.b;
         this.vertices[j + 6 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
-
     }
-
-
-
-
 
     updateCells() {
         let j = 0;
         //console.log(cells[j].homingPh+" "+(1000.0-homingEvaporation)*this.dt);
         for (let i = 0; i < cells.length * STRIDE / FLOAT_SIZE_BYTES; i += STRIDE / FLOAT_SIZE_BYTES) {
-            //cells[j].foodPh = Math.min(cells[j].foodPh, 10);
-            //cells[j].homingPh = Math.min(cells[j].homingPh, 10);
-            if (this.isPlaying) {
+    
+            // Simulate pheromone evaporation by decreasing cell pheromone strength linearly
+            if (this.isPlaying) { 
                 if (cells[j].homingPh > 0) {
                     cells[j].homingPh -= homingEvaporation / 5000 * this.dt;
                 }
@@ -491,11 +512,11 @@ class AntLab {
         this.vertices[5 + length * STRIDE / FLOAT_SIZE_BYTES] = 1;
         this.vertices[6 + length * STRIDE / FLOAT_SIZE_BYTES] = 2;
 
-        //console.log("home pos " + this.vertices[homeIndex] + " " + this.vertices[homeIndex + 1]);
         if (this.isPlaying) {
             HOME.update(this.dt);
         }
         else {
+            // If home is picked up and moved, move the ants along with it
             if (HOME.selected) {
                 let j = 0;
                 for (let i = 0.0; i < ants.length; i++) {
@@ -504,57 +525,26 @@ class AntLab {
                     this.updateAntVertices(i, j)
                     j += STRIDE / FLOAT_SIZE_BYTES;
                 }
-
-
             }
         }
     }
 
 
-
+    /*******************************************************************************************************************/
+    // Drawing
     setShaderProperties() {
         GL.useProgram(this.shader.program);
-
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer);
-
         GL.vertexAttribPointer(this.shader.propertyLocationPosition, 3, GL.FLOAT, false, STRIDE, 0);
-
         GL.bindBuffer(GL.ARRAY_BUFFER, this.vertexDataBuffer);
         GL.vertexAttribPointer(this.shader.propertyLocationColor, 4, GL.FLOAT, false, STRIDE, VERTEX_COLOR_OFFSET);
         GL.vertexAttrib1f(this.shader.propertyLocationPointSize,300/Math.max(width,height));
-
     }
-
-
-
-
-
-
-
-
-
-
-    remapValue(v, minSrc, maxSrc, minDst, maxDst) {
-        return (v - minSrc) / (maxSrc - minSrc) * (maxDst - minDst) + minDst;
-    }
-
-
-    frameCount;
-    totalTime;
-
-    then;
-    dt;
-    isPlaying;
-
-
 
     draw() {
         GL.clear(GL.COLOR_BUFFER_BIT);
-
         GL.bufferSubData(GL.ARRAY_BUFFER, 0, new Float32Array(this.vertices));
         GL.drawArrays(GL.POINTS, 0, ANT_COUNT + cells.length + 1);
-
-
     }
 
 }

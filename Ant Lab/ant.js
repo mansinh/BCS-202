@@ -47,8 +47,11 @@ class Ant {
     color;
     timeActive; index;
 
+    /*******************************************************************************************************************/
     physicsUpdate(dt){
+
         if (!this.selected) {
+            // If squished, fade away. When gone respawn at home
             if (this.squished) {
                 this.color.fadeToBlack(2, dt);
                 if (this.color.a <= 0) {
@@ -56,6 +59,7 @@ class Ant {
                     this.squished = false;
                 }
             }
+            // If velocity != 0 or if ant is abve ground, apply physics
             else if (!(this.vx == 0 && this.vy == 0 && this.vz == 0) || this.z > 0) {
                 this.physics(dt);
             }
@@ -63,14 +67,17 @@ class Ant {
     }
 
     physics(dt) {
+        // Apply gravity
         this.vz += -GRAVITY * dt;
         this.z += this.vz;
+        // Apply friction when in contact with the ground
         if (this.z <= 0) {
             this.vz = -this.vz * 0.6;
             this.vy = this.vy * 0.9;
             this.vx = this.vx * 0.9;
             this.z = 0;
         }
+        // Bounce off the edges of the simulation space
         if (this.x < -1) {
             this.x = -1;
             this.vx = -this.vx;
@@ -87,6 +94,8 @@ class Ant {
             this.y = 1;
             this.vy = -this.vy;
         }
+
+        // Round velocity to zero when small enough
         if (Math.abs(this.vz) < 0.001) {
             this.vz = 0;
 
@@ -98,11 +107,12 @@ class Ant {
             this.vx = 0;
         }
 
+        // Apply horizontal velocity
         this.x += this.vx * dt;
         this.y += this.vy * dt;
     }
 
-
+    // Update ant behaviour if ant is on ground and not squished
     update(dt) {
         this.timeActive += dt;
         if (!this.selected) {
@@ -117,15 +127,21 @@ class Ant {
 
     behaviour(dt) {
         this.t += dt;
-        this.worldBoundBehaviour();
+        // Convert canvas coordinate to cell coordinates
         this.i = Math.min(Math.round((this.x + 1.0) * width / 2), width - 1);
         this.j = Math.min(Math.round((this.y + 1.0) * height / 2), height - 1);
+
+        // Sample neighbouring cells
         var sample = this.getCells(this.i, this.j, this.senseRange);
+
+        // Detect the direction of food pheromones when finding food or homing pheromones when returning food
         var phDirection = this.sensePheromone(sample);
 
-        if (this.obstacleBehaviour()) {
+        // Detect and react to obstacles 
+        if (this.obstacleBehaviour(dt)) {
 
         }
+        // Detect and react to food and react to pheromones
         else if (this.action == FINDFOOD) {
             this.findFoodBehaviour(phDirection, sample);
         }
@@ -133,13 +149,23 @@ class Ant {
             this.homingBehaviour(phDirection, sample);
         }
 
+        // Apply movement
         this.move(dt);
-        this.pheromoneBehaviour(this.i, this.j);
+        // Stay within bounds of map
+        this.mapBoundsBehaviour();
+        // Lay pheromones onto map
+        this.layPheromoneTrail(this.i, this.j);
+
+        // If the ant has been out of home without finding food for longer than its lifespan respawn at home
         if (this.distanceTravelled > lifeSpan) {
             this.init();
         }
+        
     }
 
+    /*******************************************************************************************************************/
+    // Search cells in front of the ant for pheromones and pick the direction towards the cell with 
+    //the highest pheromone strength
     sensePheromone(sample) {
         var phDirection = new Vec2(0.0, 0.0);
         var maxPh = 0;
@@ -162,31 +188,41 @@ class Ant {
         return phDirection;
     }
 
+    /*******************************************************************************************************************/
+    // Behaviours
+
+    foodCarried = 0;
     findFoodBehaviour(foodPhDirection, sample) {
+        // Search surrounding cells for any food
         var foodCells = [];
         for (let k = 0; k < sample.length; k++) {
             if (sample[k].food > 0) {
                 foodCells.push(sample[k]);
             }
         }
+
+        // If ant is on top of food, carry the food and start returning home
         var foodFound = this.getCell(this.i, this.j).food;
         if (foodFound > 0) {
             this.action = RETURNFOOD;
             this.distanceTravelled = 0;
             this.direction = this.direction.mul(-1);
-            foodCollected += Math.min(foodFound, foodCapacity);
+            this.foodCarried = Math.min(foodFound, foodCapacity);
             this.getCell(this.i, this.j).food = Math.max(foodFound - foodCapacity, 0);
 
         }
+        // If food is found in the surrounding cells, pick one and move towards it
         else if (foodCells.length > 0) {
             var randomFoodCell = foodCells[parseInt(foodCells.length * (Math.random() * 0.99))];
             this.direction = new Vec2(randomFoodCell.x - this.x, randomFoodCell.y - this.y).normal();
         }
+        // If no food is found, follow the food pheromone trail if i exists
         else if (foodPhDirection.sqMagnitude() > 0) {
             //console.log(foodPhDirection);
             this.direction = foodPhDirection;
 
         }
+        // If there is no food or pheromone trail then wander around randomly
         else {
             this.randomTurn();
         }
@@ -194,55 +230,70 @@ class Ant {
     }
 
     homingBehaviour(homingPhDirection, sample) {
-
-        if (homingPhDirection.sqMagnitude() > 0) {
-            //console.log(homingPhDirection);
-            this.direction = homingPhDirection;
-        }
-        else{
-            this.randomTurn();
-        }
-        
+        // If the ant has arrived home, deposit the food and go out searching for more food 
         if (HOME.collide(this.x, this.y)) {
+            foodCollected += this.foodCarried;
+            this.foodCarried = 0;
             this.action = FINDFOOD;
             var angle = random() * Math.PI * 2;
             //this.direction = new Vec2(Math.cos(angle), Math.sin(angle));
             this.direction = this.direction.mul(-1);
             this.distanceTravelled = 0;
-
+            return;
         }
+        
+        // Follow a homing pheromone trail if it exist
+        if (homingPhDirection.sqMagnitude() > 0) {
+            this.direction = homingPhDirection;
+        }
+        // If there is no pheromone trail then wander around randomly
+        else{
+            this.randomTurn();
+        }
+        
+        
+        
     }
 
-    obstacleBehaviour() {
+
+    obstacleBehaviour(dt) {
         var sample = this.getCells(this.i, this.j, 1);
-        var normal = new Vec2(0.0, 0.0);
         var tangent = new Vec2(0.0, 0.0);
+        var normal = new Vec2(0.0, 0.0);
         var collided = false;
+    
+        // Search through cells in front of the ant for obstacles. If an obstacle is found, move left or right 
+        // (perpendicular to obstacle direction) 
+       
         for (let k = 0; k < sample.length; k++) {
             var cell = sample[k];
             if (cell.obstacle > 0) {
                 var cellDirection = new Vec2(cell.x - this.x, cell.y - this.y).normal();
+                // If obstacle is in front
                 if (cellDirection.dot(this.direction) > 0.5) {
+                     // Pick left or right depening on which will need the ant to turn less
+                    cellDirection = cellDirection.add(cellDirection).normal();
                     var cross = Math.sign(this.direction.x * cellDirection.y - this.direction.y * cellDirection.x);
-                    tangent = tangent.add(cellDirection.perp(cross));
-                    normal = normal.add(cellDirection);
+                    tangent =cellDirection.perp(cross);
+                    normal = cellDirection.mul(-1);
                     collided = true;
-
                 }
             }
         }
-
+        // If a collision with an obstacle is detected move away from the obstacle and turn 
         if (collided) {
             this.direction = tangent.normal();
-            tangent = tangent.normal();
-            this.x -= normal.x / width;
-            this.y -= normal.y / height;
+            normal = normal.normal();
+            this.x += normal.x * this.maxSpeed * dt*2;
+            this.y += normal.y * this.maxSpeed * dt*2;
             return true;
         }
         return false;
     }
 
-    worldBoundBehaviour() {
+    /*******************************************************************************************************************/
+    // If ant is out of bounds, return the ant within bounds and turn it away from bounds
+    mapBoundsBehaviour() {
         if (this.x > 1.0) {
             this.direction.x = - this.direction.x;
             this.x = 1.0;
@@ -260,11 +311,15 @@ class Ant {
             this.y = -1.0;
         }
     }
-
-    pheromoneBehaviour(i, j) {
+/*******************************************************************************************************************/
+    // Lay a homing pheromone trail when finding food or lay a food pheromone trail when returning home with food
+    // Pheromone strength per cell is capped at 1
+    layPheromoneTrail(i, j) {
         if (j + i * height < cells.length && j + i * height > 0) {
+            // Decrease strength of pheromone laid exponentially such that it starts at the max of 1 at home and
+            // 0.1 at the end of life span
             var phStrength = Math.exp(this.distanceTravelled * Math.log(0.1) / lifeSpan);
-            //console.log(phStrength);
+            
             switch (this.action) {
                 case 0:
                     this.layHomingPh(i, j, phStrength);
@@ -288,16 +343,14 @@ class Ant {
         //cell.foodPhDirection = cell.foodPhDirection.add(this.direction.mul(-1));
 
     }
-
-
+/*******************************************************************************************************************/
 
     move(dt) {
-
+        // Apply movement speed to ant
         this.direction = this.direction.normal();
-
-        
         var dvx = this.direction.x * this.maxSpeed * dt;
         var dvy = this.direction.y * this.maxSpeed * dt*2
+        // Flip x and y coordinates if screen orientation is portrait
         if(isPortrait){
             dvx = this.direction.x * this.maxSpeed * dt*2;
             dvy = this.direction.y * this.maxSpeed * dt
@@ -306,19 +359,23 @@ class Ant {
         this.x += dvx;
         this.y += dvy;
 
+        // Calculate distance travelled that will be a measure of how long the ant has been out on the map
         this.distanceTravelled += Math.sqrt(dvx * dvx + dvy * dvy)
 
+        // Have the ant bob up and down for a makeshift crawling animation
         //this.z = (Math.sin(this.timeActive * 60 + this.index / ANT_COUNT * Math.PI) + 1) / 4 / height;
         this.z = 2 * Math.random() / 300;
     }
 
+    // Turn a random amount
     randomTurn() {
         var angle = this.maxTurn * random();
         this.direction.x = this.direction.x * Math.cos(angle) + this.direction.y * Math.sin(angle);
         this.direction.y = -this.direction.x * Math.sin(angle) + this.direction.y * Math.cos(angle);
     }
 
-    
+    /*******************************************************************************************************************/
+    // Retrieve surroundng map cells
     getCells(x, y, size) {
         var selectedCells = [];
 
@@ -333,6 +390,7 @@ class Ant {
         return selectedCells;
     }
 
+    // Retrieve a single map cell
     getCell(x, y) {
         var i = y + x * height;
         if (i < cells.length && i > 0) {
@@ -341,6 +399,7 @@ class Ant {
         return new Cell();
     }
 
+    // Detect collision for pick up tool
     toolCollide(x, y) {
         return this.size * this.size/zoom*2 > this.sqDistance(x, y);
     }
@@ -351,6 +410,8 @@ class Ant {
         return dx * dx + dy * dy
     }
 
+    /*******************************************************************************************************************/
+    // Stop, turn into a bloody pile and play squish sound when squished by squish tool
     squished;
     squish() {
         if (!this.squished) {
